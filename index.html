@@ -1,0 +1,124 @@
+<html style="overflow-y:hidden;font-family: monospace;">
+  <select id="selectorClase">
+    <option value="procedure" selected>procedure</option>
+    <option value="function">function</option>
+  </select>
+  <input type="text" value="PintarTableroRojo" id="selectorNombre">
+  () {
+  <br/>
+  <span style="margin-left:10px;">/*</span>
+  <br/>
+  <span style="margin-left:20px;">
+    Observación: Es un recorrido de
+    <select id="selectorTipo">
+      <option value="P" selected>procesamiento</option>
+      <option value="A">acumulación</option>
+      <option value="B">búsqueda</option>
+      <option value="M">mínimo/máximo</option>
+      <option value="T">transformación</option>
+      <option value="F">filtro</option>
+    </select>
+    sobre
+    <select id="selectorColección">
+      <option value="T" selected>el tablero</option>
+      <option value="C">los colores</option>
+      <option value="D">las direcciones</option>
+      <option value="L">la lista dada</option>
+    </select>
+    </span>
+    <br/>
+    <span style="margin-left:30px;">
+    usando como subtarea
+  </span>
+  <input type="text" value="PonerUnaRoja" id="selectorSubtarea">
+  <br/>
+  <span style="margin-left:10px;">*/</span>
+  <br/>
+  }
+  <br/>
+  <textarea id="output" style="width:100%;height:100%;" readonly></textarea>
+  <script>
+    const codigosTipo = {
+      P:{E:"%{I}while(%{E}){\n  %{P}\n%{N}}%{B}",
+          P:"%{S}(%{A})"},
+      A:{E:"%{I}contador := 0\nwhile(%{E}){\n  %{P}\n%{N}}%{B}%{R}",
+          P:"contador := contador + %{S}(%{A})", R:"return(contador)"},
+      B:{E:"%{I}while(%{E} && not %{S}(%{A})){\n%{N}}%{R}",
+          R:"return(%{R})"},
+      M:{E:"%{I}mejorPorAhora := %{A}\nwhile(%{E}){\n  %{P}\n%{N}}%{B}%{R}",
+          P:"mejorPorAhora := %{S}(mejorPorAhora, %{A})", R:"return(mejorPorAhora)"},
+      T:{E:"%{I}listaTransformadaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}}%{B}%{R}",
+          P:"listaTransformadaPorAhora := listaTransformadaPorAhora ++ [%{S}(%{A})]",
+          R:"return(listaTransformadaPorAhora)"},
+      F:{E:"%{I}listaFiltradaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}}%{B}%{R}",
+          P:"listaFiltradaPorAhora := listaFiltradaPorAhora ++ singular_Si_(%{A}, %{S}(%{A}))",
+          R:"return(listaFiltradaPorAhora)"}
+    };
+    const codigosColeccion = {
+      T:{
+        I:"IrAPrimeraCeldaEnRecorridoAl_YAl_(Este, Norte)",
+        E:"haySiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
+        N:"PasarASiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
+        R:"%{S}(%{A})",
+        B:true
+      },
+      C:{
+        A:"colorActual",
+        I:"colorActual := minColor()",
+        E:"colorActual /= maxColor()",
+        N:"colorActual := siguiente(colorActual)",
+        R:"%{S}(%{A})",
+        B:true
+      },
+      D:{
+        A:"direcciónActual",
+        I:"direcciónActual := minDir()",
+        E:"direcciónActual /= maxDir()",
+        N:"direcciónActual := siguiente(direcciónActual)",
+        R:"%{S}(%{A})",
+        B:true
+      },
+      L:{
+        A:"primero(listaRestante)",
+        I:"listaRestante := listaCompleta",
+        E:"not esVacía(listaRestante)",
+        N:"listaRestante := resto(listaRestante)",
+        R:"not esVacía(listaRestante)",
+        B:false
+      }
+    };
+
+    const selectorClase = document.getElementById("selectorClase");
+    const selectorNombre = document.getElementById("selectorNombre");
+    const selectorTipo = document.getElementById("selectorTipo");
+    const selectorColeccion = document.getElementById("selectorColección");
+    const selectorSubtarea = document.getElementById("selectorSubtarea");
+    const output = document.getElementById("output");
+    const actualizarOutput = function() {
+      const clase = selectorClase.value;
+      const nombre = selectorNombre.value;
+      const tipo = codigosTipo[selectorTipo.value];
+      const coleccion = codigosColeccion[selectorColeccion.value];
+      const subtarea = selectorSubtarea.value;
+      output.value = clase + ' ' + nombre + "() {\n  " + tipo.E
+        .replace("%{I}", coleccion.I ? coleccion.I + '\n' : '')
+        .replace("%{E}", coleccion.E ? coleccion.E : 'true')
+        .replace("%{N}", coleccion.N ? "  " + coleccion.N + '\n' : '')
+        .replace("%{R}", (tipo.R && clase == 'function') ?
+          '\n' + tipo.R.replace("%{R}", coleccion.R ? coleccion.R : '') : ''
+        )
+        .replace("%{B}", coleccion.B ? '\n' + "%{P}" : '')
+        .replaceAll("%{P}", tipo.P)
+        .replaceAll("%{S}", subtarea)
+        .replaceAll("%{A}", coleccion.A ? coleccion.A : '')
+        .replaceAll('\n', "\n  ")
+      + "\n}"
+    };
+    selectorClase.onchange = actualizarOutput;
+    selectorNombre.onchange = actualizarOutput;
+    selectorTipo.onchange = actualizarOutput;
+    selectorColeccion.onchange = actualizarOutput;
+    selectorSubtarea.onchange = actualizarOutput;
+    actualizarOutput();
+  </script>
+</html>
