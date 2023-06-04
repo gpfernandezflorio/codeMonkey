@@ -1,12 +1,18 @@
 <html style="overflow-y:hidden;font-family: monospace;">
+  <select id="selectorLenguaje">
+    <option value="G" selected>Gobstones</option>
+    <option value="P">Python</option>
+    <option value="J">Javascript</option>
+  </select>
+  <br/>
   <select id="selectorClase">
-    <option value="procedure" selected>procedure</option>
-    <option value="function">function</option>
+    <option value="P" selected>procedimiento</option>
+    <option value="F">función</option>
   </select>
   <input type="text" value="PintarTableroRojo" id="selectorNombre">
-  () {
+  <span id="abrirDefinición">() {</span>
   <br/>
-  <span style="margin-left:10px;">/*</span>
+  <span id="abrirComentario" style="margin-left:10px;">/*</span>
   <br/>
   <span style="margin-left:20px;">
     Observación: Es un recorrido de
@@ -23,7 +29,7 @@
       <option value="T" selected>el tablero</option>
       <option value="C">los colores</option>
       <option value="D">las direcciones</option>
-      <option value="L">la lista dada</option>
+      <option value="L">una lista</option>
     </select>
     </span>
     <br/>
@@ -32,88 +38,210 @@
   </span>
   <input type="text" value="PonerUnaRoja" id="selectorSubtarea">
   <br/>
-  <span style="margin-left:10px;">*/</span>
+  <span id="cerrarComentario" style="margin-left:10px;">*/</span>
   <br/>
-  }
+  <span id="cerrarDefinición">}</span>
   <br/>
-  <textarea id="output" style="width:100%;height:100%;" readonly></textarea>
+  <textarea id="output" style="width:100%;height:50%;" readonly></textarea>
   <script>
     const codigosTipo = {
-      P:{E:"%{I}while(%{E}){\n  %{P}\n%{N}}%{B}",
-          P:"%{S}(%{A})"},
-      A:{E:"%{I}contador := 0\nwhile(%{E}){\n  %{P}\n%{N}}%{B}%{R}",
-          P:"contador := contador + %{S}(%{A})", R:"return(contador)"},
-      B:{E:"%{I}while(%{E} && not %{S}(%{A})){\n%{N}}%{R}",
-          R:"return(%{R})"},
-      M:{E:"%{I}mejorPorAhora := %{A}\nwhile(%{E}){\n  %{P}\n%{N}}%{B}%{R}",
-          P:"mejorPorAhora := %{S}(mejorPorAhora, %{A})", R:"return(mejorPorAhora)"},
-      T:{E:"%{I}listaTransformadaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}}%{B}%{R}",
-          P:"listaTransformadaPorAhora := listaTransformadaPorAhora ++ [%{S}(%{A})]",
-          R:"return(listaTransformadaPorAhora)"},
-      F:{E:"%{I}listaFiltradaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}}%{B}%{R}",
-          P:"listaFiltradaPorAhora := listaFiltradaPorAhora ++ singular_Si_(%{A}, %{S}(%{A}))",
-          R:"return(listaFiltradaPorAhora)"}
-    };
-    const codigosColeccion = {
-      T:{
-        I:"IrAPrimeraCeldaEnRecorridoAl_YAl_(Este, Norte)",
-        E:"haySiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
-        N:"PasarASiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
-        R:"%{S}(%{A})",
-        B:true
+      G:{
+        P:{E:"%{I}while(%{E}){\n  %{P}\n%{N}%{B}",
+            P:"%{S}(%{A})"},
+        A:{E:"%{I}contador := 0\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador := contador + %{S}(%{A})", R:"return(contador)"},
+        B:{E:"%{I}while(%{E} && not %{S}(%{A})){\n%{N}%{R}",
+            R:"return(%{R})"},
+        M:{E:"%{I}mejorPorAhora := %{A}\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora := %{S}(mejorPorAhora, %{A})", R:"return(mejorPorAhora)"},
+        T:{E:"%{I}listaTransformadaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"listaTransformadaPorAhora := listaTransformadaPorAhora ++ [%{S}(%{A})]",
+            R:"return(listaTransformadaPorAhora)"},
+        F:{E:"%{I}listaFiltradaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"listaFiltradaPorAhora := listaFiltradaPorAhora ++ singular_Si_(%{A}, %{S}(%{A}))",
+            R:"return(listaFiltradaPorAhora)"}
       },
-      C:{
-        A:"colorActual",
-        I:"colorActual := minColor()",
-        E:"colorActual /= maxColor()",
-        N:"colorActual := siguiente(colorActual)",
-        R:"%{S}(%{A})",
-        B:true
+      P:{
+        P:{E:"%{I}while %{E}:\n  %{P}\n%{N}%{B}",
+            P:"%{S}(%{A})"},
+        A:{E:"%{I}contador = 0\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + %{S}(%{A})", R:"return contador"},
+        B:{E:"%{I}while %{E} and not %{S}(%{A}):\n%{N}%{R}",
+            R:"return %{R}"},
+        M:{E:"%{I}mejorPorAhora = %{A}\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A})", R:"return mejorPorAhora"},
+        T:{E:"%{I}listaTransformadaPorAhora = []\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
+            P:"listaTransformadaPorAhora.append(%{S}(%{A}))",
+            R:"return listaTransformadaPorAhora"},
+        F:{E:"%{I}listaFiltradaPorAhora = []\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
+            P:"if %{S}(%{A}):\n  listaFiltradaPorAhora.append(%{A})",
+            R:"return listaFiltradaPorAhora"}
       },
-      D:{
-        A:"direcciónActual",
-        I:"direcciónActual := minDir()",
-        E:"direcciónActual /= maxDir()",
-        N:"direcciónActual := siguiente(direcciónActual)",
-        R:"%{S}(%{A})",
-        B:true
-      },
-      L:{
-        A:"primero(listaRestante)",
-        I:"listaRestante := listaCompleta",
-        E:"not esVacía(listaRestante)",
-        N:"listaRestante := resto(listaRestante)",
-        R:"not esVacía(listaRestante)",
-        B:false
+      J:{
+        P:{E:"%{I}while(%{E}){\n  %{P}\n%{N}%{B}",
+            P:"%{S}(%{A});"},
+        A:{E:"%{I}contador = 0;\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + %{S}(%{A});", R:"return contador;"},
+        B:{E:"%{I}while(%{E} && !%{S}(%{A})){\n%{N}%{R}",
+            R:"return %{R};"},
+        M:{E:"%{I}mejorPorAhora = %{A};\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"},
+        T:{E:"%{I}listaTransformadaPorAhora = [];\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"listaTransformadaPorAhora.push(%{S}(%{A}));",
+            R:"return listaTransformadaPorAhora;"},
+        F:{E:"%{I}listaFiltradaPorAhora = [];\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"if (%{S}(%{A})) {\n  listaFiltradaPorAhora.push(%{A});\n}",
+            R:"return listaFiltradaPorAhora;"}
       }
     };
+    const codigosColeccion = {
+      G:{
+        T:{
+          I:"IrAPrimeraCeldaEnRecorridoAl_YAl_(Este, Norte)",
+          E:"haySiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
+          N:"PasarASiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
+          R:"%{S}(%{A})",
+          B:true
+        },
+        C:{
+          A:"colorActual",
+          I:"colorActual := minColor()",
+          E:"colorActual /= maxColor()",
+          N:"colorActual := siguiente(colorActual)",
+          R:"%{S}(%{A})",
+          B:true
+        },
+        D:{
+          A:"direcciónActual",
+          I:"direcciónActual := minDir()",
+          E:"direcciónActual /= maxDir()",
+          N:"direcciónActual := siguiente(direcciónActual)",
+          R:"%{S}(%{A})",
+          B:true
+        },
+        L:{
+          A:"primero(listaRestante)",
+          I:"listaRestante := listaCompleta",
+          E:"not esVacía(listaRestante)",
+          N:"listaRestante := resto(listaRestante)",
+          R:"not esVacía(listaRestante)",
+          B:false
+        }
+      },
+      P:{
+        T:{
+          I:"IrAPrimeraCeldaEnRecorridoAl_YAl_(Este, Norte)",
+          E:"haySiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
+          N:"PasarASiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
+          R:"%{S}(%{A})",
+          B:true
+        },
+        C:{
+          A:"colorActual",
+          I:"colorActual = minColor()",
+          E:"colorActual != maxColor()",
+          N:"colorActual = siguiente(colorActual)",
+          R:"%{S}(%{A})",
+          B:true
+        },
+        D:{
+          A:"direcciónActual",
+          I:"direcciónActual = minDir()",
+          E:"direcciónActual != maxDir()",
+          N:"direcciónActual = siguiente(direcciónActual)",
+          R:"%{S}(%{A})",
+          B:true
+        },
+        L:{
+          A:"listaRestante[0]",
+          I:"listaRestante = listaCompleta",
+          E:"len(listaRestante) > 0",
+          N:"listaRestante = listaRestante[1:]",
+          R:"len(listaRestante) > 0",
+          B:false
+        }
+      },
+      J:{
+        T:{
+          I:"IrAPrimeraCeldaEnRecorridoAl_YAl_(Este, Norte);",
+          E:"haySiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
+          N:"PasarASiguienteCeldaEnRecorridoAl_YAl_(Este, Norte);",
+          R:"%{S}(%{A})",
+          B:true
+        },
+        C:{
+          A:"colorActual",
+          I:"colorActual = minColor()",
+          E:"colorActual != maxColor()",
+          N:"colorActual = siguiente(colorActual)",
+          R:"%{S}(%{A})",
+          B:true
+        },
+        D:{
+          A:"direcciónActual",
+          I:"direcciónActual = minDir()",
+          E:"direcciónActual != maxDir()",
+          N:"direcciónActual = siguiente(direcciónActual)",
+          R:"%{S}(%{A})",
+          B:true
+        },
+        L:{
+          A:"listaRestante[0]",
+          I:"listaRestante = listaCompleta",
+          E:"listaRestante.length > 0",
+          N:"listaRestante = listaRestante.slice(1)",
+          R:"listaRestante.length > 0",
+          B:false
+        }
+      }
+    };
+    const codigosOtros = {
+      G:{AD:"() {", CD:"}", AC:"/*", CC:"*/", P:"procedure", F:"function"},
+      P:{AD:"():", AC:"'''", CC:"'''", P:"def", F:"def"},
+      J:{AD:"() {", CD:"}", AC:"/*", CC:"*/", P:"function", F:"function"}
+    };
 
+    const selectorLenguaje = document.getElementById("selectorLenguaje");
     const selectorClase = document.getElementById("selectorClase");
     const selectorNombre = document.getElementById("selectorNombre");
     const selectorTipo = document.getElementById("selectorTipo");
     const selectorColeccion = document.getElementById("selectorColección");
     const selectorSubtarea = document.getElementById("selectorSubtarea");
     const output = document.getElementById("output");
+    const abrirDefinicion = document.getElementById("abrirDefinición");
+    const cerrarDefinicion = document.getElementById("cerrarDefinición");
+    const abrirComentario = document.getElementById("abrirComentario");
+    const cerrarComentario = document.getElementById("cerrarComentario");
     const actualizarOutput = function() {
+      const lenguaje = selectorLenguaje.value;
       const clase = selectorClase.value;
       const nombre = selectorNombre.value;
-      const tipo = codigosTipo[selectorTipo.value];
-      const coleccion = codigosColeccion[selectorColeccion.value];
+      const tipo = codigosTipo[lenguaje][selectorTipo.value];
+      const coleccion = codigosColeccion[lenguaje][selectorColeccion.value];
       const subtarea = selectorSubtarea.value;
-      output.value = clase + ' ' + nombre + "() {\n  " + tipo.E
+      const otros = codigosOtros[lenguaje];
+      output.value = otros[clase] + ' ' + nombre + otros.AD + "\n  " + tipo.E
         .replace("%{I}", coleccion.I ? coleccion.I + '\n' : '')
-        .replace("%{E}", coleccion.E ? coleccion.E : 'true')
-        .replace("%{N}", coleccion.N ? "  " + coleccion.N + '\n' : '')
-        .replace("%{R}", (tipo.R && clase == 'function') ?
-          '\n' + tipo.R.replace("%{R}", coleccion.R ? coleccion.R : '') : ''
+        .replace("%{E}", (coleccion.E || 'true'))
+        .replace("%{N}",
+          (coleccion.N ? "  " + coleccion.N : '') +
+          ((coleccion.N && otros.CD) ? '\n' : '') + 
+          (otros.CD || ''))
+        .replace("%{R}", (tipo.R && clase == 'F') ?
+          ('\n' + tipo.R.replace("%{R}", (coleccion.R || ''))) : ''
         )
-        .replace("%{B}", coleccion.B ? '\n' + "%{P}" : '')
-        .replaceAll("%{P}", tipo.P)
+        .replace("%{B}", coleccion.B ? '\n' + tipo.P : '')
+        .replace("%{P}", tipo.P.replaceAll('\n', "\n  "))
         .replaceAll("%{S}", subtarea)
-        .replaceAll("%{A}", coleccion.A ? coleccion.A : '')
+        .replaceAll("%{A}", (coleccion.A || ''))
         .replaceAll('\n', "\n  ")
-      + "\n}"
+      + "\n" + (otros.CD || '');
+      abrirDefinicion.innerHTML = otros.AD;
+      cerrarDefinicion.innerHTML = (otros.CD || '');
+      abrirComentario.innerHTML = otros.AC;
+      cerrarComentario.innerHTML = otros.CC;
     };
+    selectorLenguaje.onchange = actualizarOutput;
     selectorClase.onchange = actualizarOutput;
     selectorNombre.onchange = actualizarOutput;
     selectorTipo.onchange = actualizarOutput;
