@@ -4,6 +4,7 @@
     <option value="P">Python</option>
     <option value="J">Javascript</option>
   </select>
+  <input id="selectorForeach" type="checkbox">Usar foreach cuando sea posible
   <br/>
   <select id="selectorClase">
     <option value="P" selected>procedimiento</option>
@@ -19,7 +20,9 @@
     <select id="selectorTipo">
       <option value="P" selected>procesamiento</option>
       <option value="A">acumulación</option>
-      <option value="B">búsqueda</option>
+      <option value="AC">acumulación condicional</option>
+      <option value="B">búsqueda indagatoria</option>
+      <option value="BS">búsqueda segura</option>
       <option value="M">mínimo/máximo</option>
       <option value="T">transformación</option>
       <option value="F">filtro</option>
@@ -48,48 +51,102 @@
       G:{
         P:{E:"%{I}while(%{E}){\n  %{P}\n%{N}%{B}",
             P:"%{S}(%{A})"},
+        Pf:{E:"%{I}foreach %{F} {\n  %{P}\n%{N}%{B}",
+            P:"%{S}(%{A})"},
         A:{E:"%{I}contador := 0\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
             P:"contador := contador + %{S}(%{A})", R:"return(contador)"},
+        Af:{E:"%{I}contador := 0\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador := contador + %{S}(%{A})", R:"return(contador)"},
+        AC:{E:"%{I}contador := 0\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador := contador + unoSi_OCeroSiNo(%{S}(%{A}))", R:"return(contador)"},
+        ACf:{E:"%{I}contador := 0\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador := contador + unoSi_OCeroSiNo(%{S}(%{A}))", R:"return(contador)"},
         B:{E:"%{I}while(%{E} && not %{S}(%{A})){\n%{N}%{R}",
             R:"return(%{R})"},
+        BS:{E:"%{I}while(not %{S}(%{A})){\n%{N}%{R}",
+            R:"return(%{A})"},
         M:{E:"%{I}mejorPorAhora := %{A}\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora := %{S}(mejorPorAhora, %{A})", R:"return(mejorPorAhora)"},
+        Mf:{E:"%{I}mejorPorAhora := %{H}\nforeach %{T} {\n  %{P}\n%{N}%{B}%{R}",
             P:"mejorPorAhora := %{S}(mejorPorAhora, %{A})", R:"return(mejorPorAhora)"},
         T:{E:"%{I}listaTransformadaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora := listaTransformadaPorAhora ++ [%{S}(%{A})]",
             R:"return(listaTransformadaPorAhora)"},
+        Tf:{E:"%{I}listaTransformadaPorAhora := []\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
+            P:"listaTransformadaPorAhora := listaTransformadaPorAhora ++ [%{S}(%{A})]",
+            R:"return(listaTransformadaPorAhora)"},
         F:{E:"%{I}listaFiltradaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
-            P:"listaFiltradaPorAhora := listaFiltradaPorAhora ++ singular_Si_(%{A}, %{S}(%{A}))",
+            P:"listaFiltradaPorAhora := listaFiltradaPorAhora ++\n  singular_Si_(%{A}, %{S}(%{A}))",
+            R:"return(listaFiltradaPorAhora)"},
+        Ff:{E:"%{I}listaFiltradaPorAhora := []\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
+            P:"listaFiltradaPorAhora := listaFiltradaPorAhora ++\n  singular_Si_(%{A}, %{S}(%{A}))",
             R:"return(listaFiltradaPorAhora)"}
       },
       P:{
         P:{E:"%{I}while %{E}:\n  %{P}\n%{N}%{B}",
             P:"%{S}(%{A})"},
+        Pf:{E:"%{I}for %{F}:\n  %{P}%{N}%{B}",
+            P:"%{S}(%{A})"},
         A:{E:"%{I}contador = 0\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
             P:"contador = contador + %{S}(%{A})", R:"return contador"},
+        Af:{E:"%{I}contador = 0\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
+            P:"contador = contador + %{S}(%{A})", R:"return contador"},
+        AC:{E:"%{I}contador = 0\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + (1 if %{S}(%{A}) else 0)", R:"return contador"},
+        ACf:{E:"%{I}contador = 0\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
+            P:"contador = contador + (1 if %{S}(%{A}) else 0)", R:"return contador"},
         B:{E:"%{I}while %{E} and not %{S}(%{A}):\n%{N}%{R}",
             R:"return %{R}"},
+        BS:{E:"%{I}while not %{S}(%{A}):\n%{N}%{R}",
+            R:"return %{A}"},
         M:{E:"%{I}mejorPorAhora = %{A}\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A})", R:"return mejorPorAhora"},
+        Mf:{E:"%{I}mejorPorAhora = %{H}\nfor %{T}:\n  %{P}%{N}%{B}%{R}",
             P:"mejorPorAhora = %{S}(mejorPorAhora, %{A})", R:"return mejorPorAhora"},
         T:{E:"%{I}listaTransformadaPorAhora = []\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora.append(%{S}(%{A}))",
             R:"return listaTransformadaPorAhora"},
+        Tf:{E:"%{I}listaTransformadaPorAhora = []\for %{F}:\n  %{P}%{N}%{B}%{R}",
+            P:"listaTransformadaPorAhora.append(%{S}(%{A}))",
+            R:"return listaTransformadaPorAhora"},
         F:{E:"%{I}listaFiltradaPorAhora = []\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
+            P:"if %{S}(%{A}):\n  listaFiltradaPorAhora.append(%{A})",
+            R:"return listaFiltradaPorAhora"},
+        Ff:{E:"%{I}listaFiltradaPorAhora = []\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
             P:"if %{S}(%{A}):\n  listaFiltradaPorAhora.append(%{A})",
             R:"return listaFiltradaPorAhora"}
       },
       J:{
         P:{E:"%{I}while(%{E}){\n  %{P}\n%{N}%{B}",
             P:"%{S}(%{A});"},
+        Pf:{E:"%{I}for(%{F}){\n  %{P}\n%{N}%{B}",
+            P:"%{S}(%{A});"},
         A:{E:"%{I}contador = 0;\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
             P:"contador = contador + %{S}(%{A});", R:"return contador;"},
+        Af:{E:"%{I}contador = 0;\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + %{S}(%{A});", R:"return contador;"},
+        AC:{E:"%{I}contador = 0;\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + (%{S}(%{A}) ? 1 : 0);", R:"return contador;"},
+        ACf:{E:"%{I}contador = 0;\nfor(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + (%{S}(%{A}) ? 1 : 0);", R:"return contador;"},
         B:{E:"%{I}while(%{E} && !%{S}(%{A})){\n%{N}%{R}",
             R:"return %{R};"},
+        BS:{E:"%{I}while(!%{S}(%{A})){\n%{N}%{R}",
+            R:"return %{A};"},
         M:{E:"%{I}mejorPorAhora = %{A};\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"},
+        Mf:{E:"%{I}mejorPorAhora = %{H};\nfor(%{T}){\n  %{P}\n%{N}%{B}%{R}",
             P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"},
         T:{E:"%{I}listaTransformadaPorAhora = [];\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora.push(%{S}(%{A}));",
             R:"return listaTransformadaPorAhora;"},
+        Tf:{E:"%{I}listaTransformadaPorAhora = [];\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"listaTransformadaPorAhora.push(%{S}(%{A}));",
+            R:"return listaTransformadaPorAhora;"},
         F:{E:"%{I}listaFiltradaPorAhora = [];\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"if (%{S}(%{A})) {\n  listaFiltradaPorAhora.push(%{A});\n}",
+            R:"return listaFiltradaPorAhora;"},
+        Ff:{E:"%{I}listaFiltradaPorAhora = [];\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
             P:"if (%{S}(%{A})) {\n  listaFiltradaPorAhora.push(%{A});\n}",
             R:"return listaFiltradaPorAhora;"}
       }
@@ -126,6 +183,13 @@
           N:"listaRestante := resto(listaRestante)",
           R:"not esVacía(listaRestante)",
           B:false
+        },
+        Lf:{
+          A:"elementoActual",
+          F:"elementoActual in listaCompleta",
+          H:"primero(listaCompleta)",
+          T:"elementoActual in resto(listaCompleta)",
+          B:false
         }
       },
       P:{
@@ -158,6 +222,13 @@
           E:"len(listaRestante) > 0",
           N:"listaRestante = listaRestante[1:]",
           R:"len(listaRestante) > 0",
+          B:false
+        },
+        Lf:{
+          A:"elementoActual",
+          F:"elementoActual in listaCompleta",
+          H:"listaCompleta[0]",
+          T:"elementoActual in listaCompleta[1:]",
           B:false
         }
       },
@@ -192,6 +263,13 @@
           N:"listaRestante = listaRestante.slice(1)",
           R:"listaRestante.length > 0",
           B:false
+        },
+        Lf:{
+          A:"elementoActual",
+          F:"elementoActual of listaCompleta",
+          H:"listaCompleta[0]",
+          T:"elementoActual of listaCompleta.slice(1)",
+          B:false
         }
       }
     };
@@ -207,6 +285,7 @@
     const selectorTipo = document.getElementById("selectorTipo");
     const selectorColeccion = document.getElementById("selectorColección");
     const selectorSubtarea = document.getElementById("selectorSubtarea");
+    const selectorForeach = document.getElementById("selectorForeach");
     const output = document.getElementById("output");
     const abrirDefinicion = document.getElementById("abrirDefinición");
     const cerrarDefinicion = document.getElementById("cerrarDefinición");
@@ -216,10 +295,17 @@
       const lenguaje = selectorLenguaje.value;
       const clase = selectorClase.value;
       const nombre = selectorNombre.value;
-      const tipo = codigosTipo[lenguaje][selectorTipo.value];
-      const coleccion = codigosColeccion[lenguaje][selectorColeccion.value];
+      let claveTipo = selectorTipo.value;
+      let claveColeccion = selectorColeccion.value;
       const subtarea = selectorSubtarea.value;
+      const usarForeach = selectorForeach.checked;
       const otros = codigosOtros[lenguaje];
+      if (usarForeach && `${claveTipo}f` in codigosTipo[lenguaje] && `${claveColeccion}f` in codigosColeccion[lenguaje]) {
+        claveTipo = `${claveTipo}f`;
+        claveColeccion = `${claveColeccion}f`;
+      }
+      const tipo = codigosTipo[lenguaje][claveTipo];
+      const coleccion = codigosColeccion[lenguaje][claveColeccion];
       output.value = otros[clase] + ' ' + nombre + otros.AD + "\n  " + tipo.E
         .replace("%{I}", coleccion.I ? coleccion.I + '\n' : '')
         .replace("%{E}", (coleccion.E || 'true'))
@@ -230,10 +316,13 @@
         .replace("%{R}", (tipo.R && clase == 'F') ?
           ('\n' + tipo.R.replace("%{R}", (coleccion.R || ''))) : ''
         )
-        .replace("%{B}", coleccion.B ? '\n' + tipo.P : '')
-        .replace("%{P}", tipo.P.replaceAll('\n', "\n  "))
+        .replace("%{B}", (coleccion.B && tipo.P) ? '\n' + tipo.P : '')
+        .replace("%{P}", tipo.P ? tipo.P.replaceAll('\n', "\n  ") : '')
         .replaceAll("%{S}", subtarea)
+        .replaceAll("%{F}", coleccion.F || '')
         .replaceAll("%{A}", (coleccion.A || ''))
+        .replaceAll("%{H}", coleccion.H || '')
+        .replaceAll("%{T}", coleccion.T || '')
         .replaceAll('\n', "\n  ")
       + "\n" + (otros.CD || '');
       abrirDefinicion.innerHTML = otros.AD;
@@ -247,6 +336,7 @@
     selectorTipo.onchange = actualizarOutput;
     selectorColeccion.onchange = actualizarOutput;
     selectorSubtarea.onchange = actualizarOutput;
+    selectorForeach.onchange = actualizarOutput;
     actualizarOutput();
   </script>
 </html>
