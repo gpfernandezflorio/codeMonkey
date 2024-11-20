@@ -1,14 +1,9 @@
 <html style="overflow-y:hidden;font-family: monospace;">
-  <select id="selectorLenguaje">
-    <option value="G" selected>Gobstones</option>
-    <option value="P">Python</option>
-    <option value="J">Javascript</option>
+  <select id="selectorLenguaje" name="lenguaje">
   </select>
-  <input id="selectorForeach" type="checkbox">Usar foreach cuando sea posible
+  <input id="selectorForeach" name="foreach" type="checkbox">Usar foreach cuando sea posible
   <br/>
-  <select id="selectorClase">
-    <option value="P" selected>procedimiento</option>
-    <option value="F">función</option>
+  <select id="selectorClase" name="clase">
   </select>
   <input type="text" value="PintarTableroRojo" id="selectorNombre">
   <span id="abrirDefinición">() {</span>
@@ -17,22 +12,10 @@
   <br/>
   <span style="margin-left:20px;">
     Observación: Es un recorrido de
-    <select id="selectorTipo">
-      <option value="P" selected>procesamiento</option>
-      <option value="A">acumulación</option>
-      <option value="AC">acumulación condicional</option>
-      <option value="B">búsqueda indagatoria</option>
-      <option value="BS">búsqueda segura</option>
-      <option value="M">mínimo/máximo</option>
-      <option value="T">transformación</option>
-      <option value="F">filtro</option>
+    <select id="selectorTipo" name="tipo">
     </select>
     sobre
-    <select id="selectorColección">
-      <option value="T" selected>el tablero</option>
-      <option value="C">los colores</option>
-      <option value="D">las direcciones</option>
-      <option value="L">una lista</option>
+    <select id="selectorColección" name="colección">
     </select>
     </span>
     <br/>
@@ -47,6 +30,32 @@
   <br/>
   <textarea id="output" style="width:100%;height:50%;" readonly></textarea>
   <script>
+    const codigosBiblioteca = {
+      G:{
+        unoSi_OCeroSiNo:"function unoSi_OCeroSiNo(condición) {\n  return (choose 1 when (condición)\n                 0 otherwise)\n}",
+        singular_Si_:"function singular_Si_(elemnto, condición) {\n  return (choose [elemento] when (condición)\n                 [] otherwise)\n}"
+      },
+      P:{
+        Color:"",
+        minColor:"",
+        maxColor:"",
+        colorSiguiente:"",
+        Dir:"",
+        minDir:"",
+        maxDir:"",
+        dirSiguiente:""
+      },
+      J:{
+        Color:"",
+        minColor:"",
+        maxColor:"",
+        colorSiguiente:"",
+        Dir:"",
+        minDir:"",
+        maxDir:"",
+        dirSiguiente:""
+      }
+    };
     const codigosTipo = {
       G:{
         P:{E:"%{I}while(%{E}){\n  %{P}\n%{N}%{B}",
@@ -58,9 +67,9 @@
         Af:{E:"%{I}contador := 0\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
             P:"contador := contador + %{S}(%{A})", R:"return(contador)"},
         AC:{E:"%{I}contador := 0\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador := contador + unoSi_OCeroSiNo(%{S}(%{A}))", R:"return(contador)"},
+            P:"contador := contador + unoSi_OCeroSiNo(%{S}(%{A}))", R:"return(contador)", bib:["unoSi_OCeroSiNo"]},
         ACf:{E:"%{I}contador := 0\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador := contador + unoSi_OCeroSiNo(%{S}(%{A}))", R:"return(contador)"},
+            P:"contador := contador + unoSi_OCeroSiNo(%{S}(%{A}))", R:"return(contador)", bib:["unoSi_OCeroSiNo"]},
         B:{E:"%{I}while(%{E} && not %{S}(%{A})){\n%{N}%{R}",
             R:"return(%{R})"},
         BS:{E:"%{I}while(not %{S}(%{A})){\n%{N}%{R}",
@@ -77,16 +86,12 @@
             R:"return(listaTransformadaPorAhora)"},
         F:{E:"%{I}listaFiltradaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
             P:"listaFiltradaPorAhora := listaFiltradaPorAhora ++\n  singular_Si_(%{A}, %{S}(%{A}))",
-            R:"return(listaFiltradaPorAhora)"},
+            R:"return(listaFiltradaPorAhora)", bib:["singular_Si_"]},
         Ff:{E:"%{I}listaFiltradaPorAhora := []\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
             P:"listaFiltradaPorAhora := listaFiltradaPorAhora ++\n  singular_Si_(%{A}, %{S}(%{A}))",
-            R:"return(listaFiltradaPorAhora)"}
+            R:"return(listaFiltradaPorAhora)", bib:["singular_Si_"]}
       },
       P:{
-        P:{E:"%{I}while %{E}:\n  %{P}\n%{N}%{B}",
-            P:"%{S}(%{A})"},
-        Pf:{E:"%{I}for %{F}:\n  %{P}%{N}%{B}",
-            P:"%{S}(%{A})"},
         A:{E:"%{I}contador = 0\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
             P:"contador = contador + %{S}(%{A})", R:"return contador"},
         Af:{E:"%{I}contador = 0\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
@@ -106,7 +111,7 @@
         T:{E:"%{I}listaTransformadaPorAhora = []\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora.append(%{S}(%{A}))",
             R:"return listaTransformadaPorAhora"},
-        Tf:{E:"%{I}listaTransformadaPorAhora = []\for %{F}:\n  %{P}%{N}%{B}%{R}",
+        Tf:{E:"%{I}listaTransformadaPorAhora = []\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora.append(%{S}(%{A}))",
             R:"return listaTransformadaPorAhora"},
         F:{E:"%{I}listaFiltradaPorAhora = []\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
@@ -117,10 +122,6 @@
             R:"return listaFiltradaPorAhora"}
       },
       J:{
-        P:{E:"%{I}while(%{E}){\n  %{P}\n%{N}%{B}",
-            P:"%{S}(%{A});"},
-        Pf:{E:"%{I}for(%{F}){\n  %{P}\n%{N}%{B}",
-            P:"%{S}(%{A});"},
         A:{E:"%{I}contador = 0;\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
             P:"contador = contador + %{S}(%{A});", R:"return contador;"},
         Af:{E:"%{I}contador = 0;\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
@@ -149,6 +150,15 @@
         Ff:{E:"%{I}listaFiltradaPorAhora = [];\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
             P:"if (%{S}(%{A})) {\n  listaFiltradaPorAhora.push(%{A});\n}",
             R:"return listaFiltradaPorAhora;"}
+      },
+      H:{
+        A:{E:"foldr ((+) . %{S}) 0 listaCompleta"},
+        AC:{E:"foldr ((+) . (unoSi_CeroSiNo . %{S})) 0 listaCompleta"},
+        B:{E:"any %{S} listaCompleta"},
+        BS:{E:"find %{S} listaCompleta"},
+        M:{E:"foldr1 listaCompleta %{S}"},
+        T:{E:"map listaCompleta %{S}"},
+        F:{E:"filter listaCompleta %{S}"}
       }
     };
     const codigosColeccion = {
@@ -190,31 +200,31 @@
           H:"primero(listaCompleta)",
           T:"elementoActual in resto(listaCompleta)",
           B:false
+        },
+        N:{
+          A:"i",
+          I:"i := 0",
+          N:"i := i+1",
         }
       },
       P:{
-        T:{
-          I:"IrAPrimeraCeldaEnRecorridoAl_YAl_(Este, Norte)",
-          E:"haySiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
-          N:"PasarASiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
-          R:"%{S}(%{A})",
-          B:true
-        },
         C:{
           A:"colorActual",
           I:"colorActual = minColor()",
           E:"colorActual != maxColor()",
-          N:"colorActual = siguiente(colorActual)",
+          N:"colorActual = colorSiguiente(colorActual)",
           R:"%{S}(%{A})",
-          B:true
+          B:true,
+          bib:["Color","minColor","maxColor","colorSiguiente"]
         },
         D:{
           A:"direcciónActual",
           I:"direcciónActual = minDir()",
           E:"direcciónActual != maxDir()",
-          N:"direcciónActual = siguiente(direcciónActual)",
+          N:"direcciónActual = dirSiguiente(direcciónActual)",
           R:"%{S}(%{A})",
-          B:true
+          B:true,
+          bib:["Dir","minDir","maxDir","dirSiguiente"]
         },
         L:{
           A:"listaRestante[0]",
@@ -230,37 +240,37 @@
           H:"listaCompleta[0]",
           T:"elementoActual in listaCompleta[1:]",
           B:false
+        },
+        N:{
+          A:"i",
+          I:"i = 0",
+          N:"i = i+1",
         }
       },
       J:{
-        T:{
-          I:"IrAPrimeraCeldaEnRecorridoAl_YAl_(Este, Norte);",
-          E:"haySiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
-          N:"PasarASiguienteCeldaEnRecorridoAl_YAl_(Este, Norte);",
-          R:"%{S}(%{A})",
-          B:true
-        },
         C:{
           A:"colorActual",
-          I:"colorActual = minColor()",
+          I:"let colorActual = minColor();",
           E:"colorActual != maxColor()",
-          N:"colorActual = siguiente(colorActual)",
+          N:"colorActual = siguiente(colorActual);",
           R:"%{S}(%{A})",
-          B:true
+          B:true,
+          bib:["Color","minColor","maxColor","colorSiguiente"]
         },
         D:{
           A:"direcciónActual",
-          I:"direcciónActual = minDir()",
+          I:"let direcciónActual = minDir();",
           E:"direcciónActual != maxDir()",
-          N:"direcciónActual = siguiente(direcciónActual)",
+          N:"direcciónActual = dirSiguiente(direcciónActual);",
           R:"%{S}(%{A})",
-          B:true
+          B:true,
+          bib:["Dir","minDir","maxDir","dirSiguiente"]
         },
         L:{
           A:"listaRestante[0]",
-          I:"listaRestante = listaCompleta",
+          I:"let listaRestante = listaCompleta;",
           E:"listaRestante.length > 0",
-          N:"listaRestante = listaRestante.slice(1)",
+          N:"listaRestante = listaRestante.slice(1);",
           R:"listaRestante.length > 0",
           B:false
         },
@@ -270,13 +280,20 @@
           H:"listaCompleta[0]",
           T:"elementoActual of listaCompleta.slice(1)",
           B:false
+        },
+        N:{
+          A:"i",
+          I:"let i = 0;",
+          N:"i = i+1;",
         }
-      }
+      },
+      H:{L:{}}
     };
     const codigosOtros = {
-      G:{AD:"() {", CD:"}", AC:"/*", CC:"*/", P:"procedure", F:"function"},
-      P:{AD:"():", AC:"'''", CC:"'''", P:"def", F:"def"},
-      J:{AD:"() {", CD:"}", AC:"/*", CC:"*/", P:"function", F:"function"}
+      G:{AD:"() {\n  ", CD:"\n}", AC:"/*", CC:"*/", P:"procedure ", F:"function "},
+      P:{AD:"():\n  ", AC:"'''", CC:"'''", P:"def ", F:"def "},
+      J:{AD:"() {\n  ", CD:"\n}", AC:"/*", CC:"*/", P:"function ", F:"function "},
+      H:{AD:" = ", CD:"", AC:"{--", CC:"--}", F:""}
     };
 
     const selectorLenguaje = document.getElementById("selectorLenguaje");
@@ -291,7 +308,122 @@
     const cerrarDefinicion = document.getElementById("cerrarDefinición");
     const abrirComentario = document.getElementById("abrirComentario");
     const cerrarComentario = document.getElementById("cerrarComentario");
-    const actualizarOutput = function() {
+    const opciones = [
+      {name:"lenguaje", selector: selectorLenguaje, opciones:[
+        {k:"G", n:"Gobstones"},
+        {k:"P", n:"Python"},
+        {k:"J", n:"Javascript"},
+        {k:"H", n:"Haskell"}
+      ], title:"el lenguaje", error: function(src, actual) {
+        return `El lenguaje ${actual} no soporta ${src.opt} ${src.name}`
+      }, validaciones:{
+        clase: (v) => ((x) => x in codigosOtros[v]),
+        tipo: (v) => ((x) => x in codigosTipo[v]),
+        colección: (v) => ((x) => x in codigosColeccion[v])
+      }},
+      {name:"clase", selector: selectorClase, opciones:[
+        {k:"P", n:"procedimiento"},
+        {k:"F", n:"función"}
+      ], title:"un", error: function(src, actual) {
+        return `Un ${actual} no se puede definir con ${src.opt} ${src.name}`
+      }, validaciones:{
+        lenguaje: (v) => ((x) => v in codigosOtros[x]),
+        tipo: (v) => ((x) => v == "P" || x != "P")
+      }},
+      {name:"tipo", selector: selectorTipo, opciones:[
+        {k:"P", n:"procesamiento"},
+        {k:"A", n:"acumulación"},
+        {k:"AC", n:"acumulación condicional"},
+        {k:"B", n:"búsqueda indagatoria"},
+        {k:"BS", n:"búsqueda segura"},
+        {k:"M", n:"mínimo/máximo"},
+        {k:"T", n:"transformación"},
+        {k:"F", n:"filtro"}
+      ], title:"el esquema de recorrido de", error: function(src, actual) {
+        return `El esquema de recorrido de ${actual} no se puede realizar con ${src.opt} ${src.name}`
+      }, validaciones:{
+        lenguaje: (v) => ((x) => v in codigosTipo[x]),
+        colección: (v) => ((x) => tiposPorColeccion[x].includes(v)),
+        clase: (v) => ((x) => x == "P" || v != "P")
+      }},
+      {name:"colección", selector: selectorColeccion, opciones:[
+        {k:"T", n:"el tablero", tipos:["P","A","AC","B","BS","M"]},
+        {k:"C", n:"los colores", tipos:["P","A","AC","B","BS","M"]},
+        {k:"D", n:"las direcciones", tipos:["P","A","AC","B","BS","M"]},
+        {k:"L", n:"una lista", tipos:["P","A","AC","B","BS","M","T","F"]},
+        {k:"N", n:"los números naturales", tipos:["BS"]}
+      ], title:"la colección", error: function(src, actual) {
+        return `La colección ${actual} no se puede recorrer con ${src.opt} ${src.name}`
+      }, validaciones:{
+        lenguaje: (v) => ((x) => v in codigosColeccion[x]),
+        tipo: (v) => ((x) => tiposPorColeccion[v].includes(x))
+      }}
+    ];
+    const datosDeOpcion = function(objeto, clave, nombre) {
+      for (let o of objeto) {
+        if (o[clave] == nombre) {
+          return o;
+        }
+      }
+    };
+    const validarSelector = function(nombre, f, src) {
+      let res = "";
+      const datos = datosDeOpcion(opciones, "name", nombre);
+      const selector = datos.selector;
+      let actual = selector.value;
+      if (actual === '') {
+        actual = datos.opciones.filter(x => f(x.k))[0].k;
+      } else if (!f(actual)) {
+        res = datos.error(src, datosDeOpcion(datos.opciones, "k", actual).n);
+        if (!tmpErrores.some(x => x.src == src.k && x.v == nombre)) {
+          tmpErrores.push({src:src.k, v:nombre});
+        }
+      }
+      return res;
+    };
+    let tmpErrores = [];
+    const actualizarOpciones = function(e) {
+      let opcionElegida = e.target.getAttribute('name');
+      const res = [];
+      for (let e of tmpErrores) {
+        if (e.src == opcionElegida) {
+          e.d = true;
+        } else {
+          let datosTmp = datosDeOpcion(opciones, "name", e.src);
+          let nuevoValor = datosTmp.selector.value;
+          let v = validarSelector(e.v, datosTmp.validaciones[e.v](nuevoValor), {
+            k:e.src, opt:datosTmp.title, name:datosDeOpcion(datosTmp.opciones, "k", nuevoValor).n
+          });
+          if (v.length == 0) {
+            e.d = true;
+          } else {
+            res.push(v);
+          }
+        }
+      }
+      const datos = datosDeOpcion(opciones, "name", opcionElegida);
+      if (datos) {
+        let valorElegido = e.target.value;
+        const src = {
+          k:opcionElegida,
+          opt:datos.title,
+          name:datosDeOpcion(datos.opciones, "k", valorElegido).n
+        };
+        tmpErrores = tmpErrores.filter(x => !('d' in x));
+        for (let v in datos.validaciones) {
+          res.push(validarSelector(v, datos.validaciones[v](valorElegido), src));
+        }
+      }
+      return res.filter(x => x.length > 0).join("\n\n* ");
+    };
+    const actualizarOutput = function(e) {
+      if (e) {
+        let res = actualizarOpciones(e);
+        if (res != "") {
+          output.value = "Combinación inválida:\n\n* " + res;
+          return;
+        }
+      }
       const lenguaje = selectorLenguaje.value;
       const clase = selectorClase.value;
       const nombre = selectorNombre.value;
@@ -300,13 +432,23 @@
       const subtarea = selectorSubtarea.value;
       const usarForeach = selectorForeach.checked;
       const otros = codigosOtros[lenguaje];
+      let bibliotecas = [];
       if (usarForeach && `${claveTipo}f` in codigosTipo[lenguaje] && `${claveColeccion}f` in codigosColeccion[lenguaje]) {
         claveTipo = `${claveTipo}f`;
         claveColeccion = `${claveColeccion}f`;
       }
       const tipo = codigosTipo[lenguaje][claveTipo];
       const coleccion = codigosColeccion[lenguaje][claveColeccion];
-      output.value = otros[clase] + ' ' + nombre + otros.AD + "\n  " + tipo.E
+      if ('bib' in tipo) {
+        bibliotecas = bibliotecas.concat(tipo.bib).map(x => codigosBiblioteca[lenguaje][x]);
+      }
+      if ('bib' in coleccion) {
+        bibliotecas = bibliotecas.concat(coleccion.bib).map(x => codigosBiblioteca[lenguaje][x]);
+      }
+      if (bibliotecas.length > 0) {
+        bibliotecas = "\n\n" + bibliotecas.join("\n\n");
+      }
+      output.value = otros[clase] + nombre + otros.AD + tipo.E
         .replace("%{I}", coleccion.I ? coleccion.I + '\n' : '')
         .replace("%{E}", (coleccion.E || 'true'))
         .replace("%{N}",
@@ -324,12 +466,16 @@
         .replaceAll("%{H}", coleccion.H || '')
         .replaceAll("%{T}", coleccion.T || '')
         .replaceAll('\n', "\n  ")
-      + "\n" + (otros.CD || '');
+      + (otros.CD || '') + bibliotecas;
       abrirDefinicion.innerHTML = otros.AD;
       cerrarDefinicion.innerHTML = (otros.CD || '');
       abrirComentario.innerHTML = otros.AC;
       cerrarComentario.innerHTML = otros.CC;
     };
+    const tiposPorColeccion = {};
+    for (let c of datosDeOpcion(opciones, "name", "colección").opciones) {
+      tiposPorColeccion[c.k] = c.tipos;
+    }
     selectorLenguaje.onchange = actualizarOutput;
     selectorClase.onchange = actualizarOutput;
     selectorNombre.onchange = actualizarOutput;
@@ -337,6 +483,23 @@
     selectorColeccion.onchange = actualizarOutput;
     selectorSubtarea.onchange = actualizarOutput;
     selectorForeach.onchange = actualizarOutput;
+    const inicializacion = {
+      "lenguaje":"G",
+      "clase":"P",
+      "tipo":"P",
+      "colección":"T"
+    };
+    for (let s in inicializacion) {
+      let datos = datosDeOpcion(opciones, "name", s)
+      let contenido = "";
+      for (let o of datos.opciones) {
+        contenido += `<option value="${o.k}"${contenido.length == 0 ? ' selected' : ''}>${o.n}</option>`;
+      }
+      datos.selector.innerHTML = contenido;
+    }
+    for (let s in inicializacion) {
+      actualizarOpciones({target:{getAttribute:x=>s, value:inicializacion[s]}});
+    }
     actualizarOutput();
   </script>
 </html>
