@@ -35,9 +35,20 @@
   <textarea id="output" style="width:100%;height:50%;background-color: #e0e0e0;" readonly></textarea>
   <script>
     const codigosImport = {
+      P:{
+        Enum:"from enum import Enum",
+        Color:"class Color(Enum):\n  Azul = 1\n  Negro = 2\n  Rojo = 3\n  Verde = 4",
+        Dir:"class Dirección(Enum):\n  Norte = 1\n  Este = 2\n  Sur = 3\n  Oeste = 4"
+      },
+      J:{
+        Color:"const Color = {\n  Azul: Symbol('Azul'),\n  Negro: Symbol('Negro'),\n  Rojo: Symbol('Rojo'),\n  Verde: Symbol('Verde')\n};\nObject.freeze(Color);",
+        Dir:"const Dirección = {\n  Norte: Symbol('Norte'),\n  Este: Symbol('Este'),\n  Sur: Symbol('Sur'),\n  Oeste: Symbol('Oeste')\n};\nObject.freeze(Dirección);"
+      },
       H:{
         List:"import Data.List",
-        Maybe:"import Data.Maybe"
+        Maybe:"import Data.Maybe",
+        Color:"Data Color = Azul | Negro | Rojo | Verde",
+        Dir:"Data Dirección = Norte | Este | Sur | Oeste"
       }
     };
     const codigosBiblioteca = {
@@ -48,29 +59,31 @@
       P:{
         unoSi_OCeroSiNo:"def unoSi_OCeroSiNo(condición):\n  return 1 if condición else 0",
         singular_Si_:"def singular_Si_(elemento, condición):\n return [elemento] if condición else []",
-        Color:"",
-        minColor:"",
-        maxColor:"",
-        colorSiguiente:"",
-        Dir:"",
-        minDir:"",
-        maxDir:"",
-        dirSiguiente:""
+        minColor:"def minColor():\n  return Color.Azul",
+        maxColor:"def maxColor():\n  return Color.Verde",
+        colorSiguiente:"def colorSiguiente(color):\n  match color:\n    case Color.Azul:\n      return Color.Negro\n    case Color.Negro:\n      return Color.Rojo\n    case Color.Rojo:\n      return Color.Verde",
+        minDir:"def minDir():\n  return Dirección.Norte",
+        maxDir:"def maxDir():\n  return Dirección.Oeste",
+        dirSiguiente:"def dirSiguiente(dirección):\n  match dirección:\n    case Dirección.Norte:\n      return Dirección.Este\n    case Dirección.Este:\n      return Dirección.Sur\n    case Dirección.Sur:\n      return Dirección.Oeste"
       },
       J:{
         unoSi_OCeroSiNo:"function unoSi_OCeroSiNo(condición) {\n  return condición ? 1 : 0;\n}",
         singular_Si_:"function singular_Si_(elemento, condición) {\n  return condición ? [elemento] : [];\n}",
-        Color:"",
-        minColor:"",
-        maxColor:"",
-        colorSiguiente:"",
-        Dir:"",
-        minDir:"",
-        maxDir:"",
-        dirSiguiente:""
+        minColor:"function minColor() {\n  return Color.Azul;\n}",
+        maxColor:"function maxColor() {\n  return Color.Verde;\n}",
+        colorSiguiente:"function colorSiguiente(color) {\n  switch(color) {\n    case Color.Azul:\n      return Color.Negro;\n    case Color.Negro:\n      return Color.Rojo;\n    case Color.Rojo:\n      return Dirección.Verde;\n  }\n}",
+        minDir:"function minDir() {\n  return Dirección.Norte;\n}",
+        maxDir:"function maxDir() {\n  return Dirección.Oeste;\n}",
+        dirSiguiente:"function dirSiguiente(dirección) {\n  switch(dirección) {\n    case Dirección.Norte:\n      return Dirección.Este;\n    case Dirección.Este:\n      return Dirección.Sur;\n    case Dirección.Sur:\n      return Dirección.Oeste;\n  }\n}"
       },
       H:{
-        unoSi_OCeroSiNo:"unoSi_OCeroSiNo condición = if condición then 1 else 0"
+        unoSi_OCeroSiNo:"unoSi_OCeroSiNo condición = if condición then 1 else 0",
+        minColor:"minColor = Azul",
+        maxColor:"maxColor = Verde",
+        colorSiguiente:"colorSiguiente Azul = Negro\ncolorSiguiente Negro = Rojo\ncolorSiguiente Rojo = Verde",
+        minDir:"minDir = Norte",
+        maxDir:"maxDir = Oeste",
+        dirSiguiente:"dirSiguiente Norte = Este\ndirSiguiente Este = Sur\ndirSiguiente Sur = Oeste\n"
       }
     };
     const codigosTipo = {
@@ -481,7 +494,17 @@
             N:"colorActual = colorSiguiente(colorActual)",
             R:"%{S}(%{A})",
             B:true,
-            bib:["Color","minColor","maxColor","colorSiguiente"]
+            imp:["Enum","Color"],
+            bib:["minColor","maxColor","colorSiguiente"]
+          },
+          f:{
+            A:"colorActual",
+            F:"colorActual in Color",
+            H:"minColor()",
+            T:"colorActual in Color",
+            B:false,
+            imp:["Color"],
+            bib:["minColor"]
           }
         },
         D:{
@@ -492,7 +515,17 @@
             N:"direcciónActual = dirSiguiente(direcciónActual)",
             R:"%{S}(%{A})",
             B:true,
-            bib:["Dir","minDir","maxDir","dirSiguiente"]
+            imp:["Enum","Dir"],
+            bib:["minDir","maxDir","dirSiguiente"]
+          },
+          f:{
+            A:"direcciónActual",
+            F:"direcciónActual in Dirección",
+            H:"minDir()",
+            T:"direcciónActual in Dirección",
+            B:false,
+            imp:["Dir"],
+            bib:["minDir"]
           }
         },
         L:{
@@ -539,7 +572,17 @@
             N:"colorActual = siguiente(colorActual);",
             R:"%{S}(%{A})",
             B:true,
-            bib:["Color","minColor","maxColor","colorSiguiente"]
+            imp:["Color"],
+            bib:["minColor","maxColor","colorSiguiente"]
+          },
+          f:{
+            A:"colorActual",
+            F:"colorActual of Object.values(Color)",
+            H:"minColor",
+            T:"colorActual of Object.values(Color).slice(1)",
+            B:false,
+            imp:["Color"],
+            bib:["minColor"]
           }
         },
         D:{
@@ -550,7 +593,17 @@
             N:"direcciónActual = dirSiguiente(direcciónActual);",
             R:"%{S}(%{A})",
             B:true,
-            bib:["Dir","minDir","maxDir","dirSiguiente"]
+            imp:["Dir"],
+            bib:["minDir","maxDir","dirSiguiente"]
+          },
+          f:{
+            A:"direcciónActual",
+            F:"direcciónActual of Object.values(Dirección)",
+            H:"minDir",
+            T:"direcciónActual of Object.values(Dirección).slice(1)",
+            B:false,
+            imp:["Dir"],
+            bib:["minDir"]
           }
         },
         L:{
@@ -897,6 +950,12 @@
         actualizarOpciones({target:{getAttribute:x=>s, value:inicializacion[s]}});
       }
       actualizarOutput();
+    };
+    const test = function(data) {
+      for (let o of opciones) {
+        o.selector.value = data[o.name];
+        actualizarOutput({target:{getAttribute:x=>o.name, value:data[o.name]}});
+      }
     };
   </script>
 </html>
