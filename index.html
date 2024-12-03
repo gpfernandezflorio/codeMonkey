@@ -957,5 +957,25 @@
         actualizarOutput({target:{getAttribute:x=>o.name, value:data[o.name]}});
       }
     };
+    const testAll = function() {
+      const f = function(ops) {
+        if (ops.length == 0) {
+          return [{}];
+        } else {
+          return f(ops.slice(1)).map((r) => ops[0].opciones.map((o) => Object.assign({[ops[0].name]:o.k}, r))).flat();
+        }
+      };
+      const todo = f(opciones.toReversed());
+      const unit = function(ops) {
+        if (ops.length == 0) {
+          alert("FIN");
+        } else {
+          console.log(ops.length);
+          test(ops[0]);
+          setTimeout(function() { unit(ops.slice(1)); }, 1);
+        }
+      };
+      unit(todo);
+    };
   </script>
 </html>
