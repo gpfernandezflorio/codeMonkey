@@ -212,7 +212,8 @@
         AC:{
           w:{
             E:"%{I}contador = 0\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador = contador + (1 if %{S}(%{A}) else 0)", R:"return contador"
+            P:"contador = contador + unoSi_OCeroSiNo(%{S}(%{A}))", R:"return contador",
+            bib:["unoSi_OCeroSiNo"]
           },
           f:{
             E:"%{I}contador = 0\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
@@ -245,7 +246,7 @@
             R:"return %{A}"
           },
           r:{
-            EP:"if not %{S}(%{H}):\n%{N}%{REC}(%{T})",
+            EP:"if not %{S}(%{H}):\n%{N}  %{REC}(%{T})",
             EF:"return %{H} if %{S}(%{H}) else %{REC}(%{T})"
           },
           h:{
@@ -347,7 +348,7 @@
             bib:["unoSi_OCeroSiNo"]
           },
           f:{
-            E:"%{I}contador = 0;\nfor(%{E}){\n  %{P}%{N}%{B}%{R}",
+            E:"%{I}contador = 0;\nfor(%{F}){\n  %{P}%{N}%{B}%{R}",
             P:"contador = contador + unoSi_OCeroSiNo(%{S}(%{A}));", R:"return contador;",
             bib:["unoSi_OCeroSiNo"]
           },
@@ -376,7 +377,7 @@
             R:"return %{A};"
           },
           r:{
-            EP:"if (!%{S}(%{H})) {\n%{N}%{REC}(%{T});\n}",
+            EP:"if (!%{S}(%{H})) {\n  %{REC}(%{T});\n}",
             EF:"return %{S}(%{H}) ? %{H} : %{REC}(%{T});"
           },
           h:{
@@ -472,7 +473,7 @@
             bib:["unoSi_OCeroSiNo"]
           },
           f:{
-            E:"%{I}int contador = 0;\nfor(%{E}){\n  %{P}%{N}%{B}%{R}",
+            E:"%{I}int contador = 0;\nfor(%{F}){\n  %{P}%{N}%{B}%{R}",
             P:"contador = contador + unoSi_OCeroSiNo(%{S}(%{A}));", R:"return contador;",
             bib:["unoSi_OCeroSiNo"]
           },
@@ -1079,10 +1080,10 @@
       const tipo = codigosTipo[lenguaje][claveTipo][mecanismo];
       const coleccion = codigosColeccion[lenguaje][claveColeccion][mecanismo];
       if ('bib' in tipo) {
-        bibliotecas = bibliotecas.concat(tipo.bib).map(x => codigosBiblioteca[lenguaje][x]);
+        bibliotecas = bibliotecas.concat(tipo.bib.map(x => codigosBiblioteca[lenguaje][x]));
       }
       if ('bib' in coleccion) {
-        bibliotecas = bibliotecas.concat(coleccion.bib).map(x => codigosBiblioteca[lenguaje][x]);
+        bibliotecas = bibliotecas.concat(coleccion.bib.map(x => codigosBiblioteca[lenguaje][x]));
       }
       if (bibliotecas.length > 0) {
         bibliotecas = "\n\n" + bibliotecas.join("\n\n");
@@ -1090,10 +1091,10 @@
         bibliotecas = "";
       }
       if ('imp' in tipo) {
-        modulos = modulos.concat(tipo.imp).map(x => codigosImport[lenguaje][x]);
+        modulos = modulos.concat(tipo.imp.map(x => codigosImport[lenguaje][x]));
       }
       if ('imp' in coleccion) {
-        modulos = modulos.concat(coleccion.imp).map(x => codigosImport[lenguaje][x]);
+        modulos = modulos.concat(coleccion.imp.map(x => codigosImport[lenguaje][x]));
       }
       if (modulos.length > 0) {
         modulos = modulos.join("\n") + "\n\n";
@@ -1192,6 +1193,9 @@
       for (let o of opciones) {
         o.selector.value = data[o.name];
         actualizarOutput({target:{getAttribute:x=>o.name, value:data[o.name]}});
+        /* if (!output.value.startsWith("Combinación inválida")) {
+          console.log(output.value);
+        } */
       }
     };
     const testAll = function() {
