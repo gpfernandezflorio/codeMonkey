@@ -44,6 +44,9 @@
         Color:"const Color = {\n  Azul: Symbol('Azul'),\n  Negro: Symbol('Negro'),\n  Rojo: Symbol('Rojo'),\n  Verde: Symbol('Verde')\n};\nObject.freeze(Color);",
         Dir:"const Dirección = {\n  Norte: Symbol('Norte'),\n  Este: Symbol('Este'),\n  Sur: Symbol('Sur'),\n  Oeste: Symbol('Oeste')\n};\nObject.freeze(Dirección);"
       },
+      C:{
+        vector:"#include <vector>"
+      },
       H:{
         List:"import Data.List",
         Maybe:"import Data.Maybe",
@@ -75,6 +78,11 @@
         minDir:"function minDir() {\n  return Dirección.Norte;\n}",
         maxDir:"function maxDir() {\n  return Dirección.Oeste;\n}",
         dirSiguiente:"function dirSiguiente(dirección) {\n  switch(dirección) {\n    case Dirección.Norte:\n      return Dirección.Este;\n    case Dirección.Este:\n      return Dirección.Sur;\n    case Dirección.Sur:\n      return Dirección.Oeste;\n  }\n}"
+      },
+      C: {
+        unoSi_OCeroSiNo:"int unoSi_OCeroSiNo(condición) {\n  return condición ? 1 : 0;\n}",
+        singular_Si_:"vector<type> singular_Si_(elemento, condición) {\n  return condición ? {elemento} : {};\n}",
+        sinElPrimero:"vector<type> sinElPrimero(vector<type> listaOriginal) {\n  vector<type> listaResultante = {};\n  for (int i=1; i<lista.size(); i++) {\n    listaResultante.push_back(listaOriginal.at(i));\n  }\n}"
       },
       H:{
         unoSi_OCeroSiNo:"unoSi_OCeroSiNo condición = if condición then 1 else 0",
@@ -395,6 +403,99 @@
           }
         }
       },
+      C:{
+        A:{
+          w:{
+            E:"%{I}int contador = 0;\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + %{S}(%{A});", R:"return contador;"
+          },
+          f:{
+            E:"%{I}int contador = 0;\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + %{S}(%{A});", R:"return contador;"
+          },
+          r:{
+            E:"return %{E} ? %{REC}(%{T}) + %{S}(%{H}) : 0;"
+          }
+        },
+        AC:{
+          w:{
+            E:"%{I}int contador = 0;\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + unoSi_OCeroSiNo(%{S}(%{A}));", R:"return contador;",
+            bib:["unoSi_OCeroSiNo"]
+          },
+          f:{
+            E:"%{I}int contador = 0;\nfor(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + unoSi_OCeroSiNo(%{S}(%{A}));", R:"return contador;",
+            bib:["unoSi_OCeroSiNo"]
+          },
+          r:{
+            E:"return %{E} ? %{REC}(%{T}) + unoSi_OCeroSiNo(%{S}(%{H})) : 0;",
+            bib:["unoSi_OCeroSiNo"]
+          }
+        },
+        B:{
+          w:{
+            E:"%{I}while(%{E} && !%{S}(%{A})){\n%{N}%{R}",
+            R:"return %{R};"
+          },
+          r:{
+            E:"return %{E} && (%{S}(%{H}) || %{REC}(%{T}));"
+          }
+        },
+        BS:{
+          w:{E:"%{I}while(!%{S}(%{A})){\n%{N}%{R}",
+            R:"return %{A};"
+          },
+          r:{
+            EP:"if (!%{S}(%{H})) {\n%{N}%{REC}(%{T});\n}",
+            EF:"return %{S}(%{H}) ? %{H} : %{REC}(%{T});"
+          }
+        },
+        M:{
+          w:{
+            E:"%{I}type mejorPorAhora = %{A};\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"
+          },
+          f:{
+            E:"%{I}type mejorPorAhora = %{H};\nfor(%{T}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"
+          },
+          r:{
+            E:"return %{Em} ? %{S}(%{REC}(%{T}), %{H}) : %{H};"
+          }
+        },
+        T:{
+          w:{
+            E:"%{I}vector<type> listaTransformadaPorAhora = {};\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"listaTransformadaPorAhora.push_back(%{S}(%{A}));",
+            R:"return listaTransformadaPorAhora;"
+          },
+          f:{
+            E:"%{I}vector<type> listaTransformadaPorAhora = {};\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"listaTransformadaPorAhora.push_back(%{S}(%{A}));",
+            R:"return listaTransformadaPorAhora;"
+          },
+          r:{
+            E:"return %{E} ? %{S}(%{H}) + %{REC}(%{T}) : {};"
+          }
+        },
+        F:{
+          w:{
+            E:"%{I}vector<type> listaFiltradaPorAhora = {};\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"if (%{S}(%{A})) {\n  listaFiltradaPorAhora.push_back(%{A});\n}",
+            R:"return listaFiltradaPorAhora;"
+          },
+          f:{
+            E:"%{I}vector<type> listaFiltradaPorAhora = {};\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"if (%{S}(%{A})) {\n  listaFiltradaPorAhora.push_back(%{A});\n}",
+            R:"return listaFiltradaPorAhora;"
+          },
+          r:{
+            E:"return %{E} ? singular_Si_(%{H}, %{S}(%{H})) + %{REC}(%{T}) : {};",
+            bib:["singular_Si_"]
+          }
+        }
+      },
       H:{
         A:{
           r:{E:"%{REC} %{CB} = 0\n%{REC} %{CR} = %{S} %{H} + %{REC} %{T}", noname: true},
@@ -641,6 +742,87 @@
           }
         }
       },
+      C:{
+        /*C:{
+          w:{
+            A:"colorActual",
+            I:"let colorActual = minColor();",
+            E:"colorActual != maxColor()",
+            N:"colorActual = siguiente(colorActual);",
+            R:"%{S}(%{A})",
+            B:true,
+            imp:["Color"],
+            bib:["minColor","maxColor","colorSiguiente"]
+          },
+          f:{
+            A:"colorActual",
+            F:"colorActual of Object.values(Color)",
+            H:"minColor",
+            T:"colorActual of Object.values(Color).slice(1)",
+            B:false,
+            imp:["Color"],
+            bib:["minColor"]
+          }
+        },
+        D:{
+          w:{
+            A:"direcciónActual",
+            I:"let direcciónActual = minDir();",
+            E:"direcciónActual != maxDir()",
+            N:"direcciónActual = dirSiguiente(direcciónActual);",
+            R:"%{S}(%{A})",
+            B:true,
+            imp:["Dir"],
+            bib:["minDir","maxDir","dirSiguiente"]
+          },
+          f:{
+            A:"direcciónActual",
+            F:"direcciónActual of Object.values(Dirección)",
+            H:"minDir",
+            T:"direcciónActual of Object.values(Dirección).slice(1)",
+            B:false,
+            imp:["Dir"],
+            bib:["minDir"]
+          }
+        },*/
+        L:{
+          w:{
+            A:"listaRestante.front()",
+            I:"vector<type> listaRestante = listaCompleta;",
+            E:"listaRestante.size() > 0",
+            N:"listaRestante = sinElPrimero(listaRestante);",
+            R:"listaRestante.size() > 0",
+            B:false,
+            imp:["vector"],
+            bib:["sinElPrimero"]
+          },
+          f:{
+            A:"elementoActual",
+            F:"type elementoActual : listaCompleta",
+            H:"listaCompleta.front()",
+            T:"type elementoActual : sinElPrimero(listaCompleta)",
+            B:false,
+            imp:["vector"],
+            bib:["sinElPrimero"]
+          },
+          r:{
+            E:"lista.size() > 0",
+            Em:"lista.size() > 1",
+            H:"lista.front()",
+            T:"sinElPrimero(lista)",
+            B:false,
+            imp:["vector"],
+            bib:["sinElPrimero"]
+          }
+        },
+        N:{
+          w:{
+            A:"i",
+            I:"int i = 0;",
+            N:"i = i+1;",
+          }
+        }
+      },
       H:{
         L:{
           r:{
@@ -670,6 +852,11 @@
         P:"function ", F:"function ",
         mecanismos: ["w","f","r","h"]
       },
+      C:{
+        AD:"() {\n  ", CD:"\n}", AC:"/*", CC:"*/",
+        P:"void ", F:"type ",
+        mecanismos: ["w","f","r"]
+      },
       H:{
         AD:" = ", CD:"", AC:"{--", CC:"--}",
         F:"",
@@ -694,6 +881,7 @@
         {k:"G", n:"Gobstones"},
         {k:"P", n:"Python"},
         {k:"J", n:"Javascript"},
+        {k:"C", n:"C++"},
         {k:"H", n:"Haskell"}
       ], title:"el lenguaje", error: function(src, actual) {
         return `El lenguaje ${actual} no soporta ${src.opt} ${src.name}`
