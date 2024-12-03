@@ -1,7 +1,8 @@
 <html style="overflow-y:hidden;font-family: monospace;">
-  <select id="selectorLenguaje" name="lenguaje">
+  Lenguaje: <select id="selectorLenguaje" name="lenguaje">
   </select>
-  <input id="selectorForeach" name="foreach" type="checkbox">Usar foreach cuando sea posible
+  Mecanismo de recorrido: <select id="selectorMecanismo" name="mecanismo">
+  </select>
   <br/>
   <select id="selectorClase" name="clase">
   </select>
@@ -15,7 +16,7 @@
     <select id="selectorTipo" name="tipo">
     </select>
     sobre
-    <select id="selectorColección" name="colección">
+    <select id="selectorColeccion" name="coleccion">
     </select>
     </span>
     <br/>
@@ -42,6 +43,8 @@
         singular_Si_:"function singular_Si_(elemnto, condición) {\n  return (choose [elemento] when (condición)\n                 [] otherwise)\n}"
       },
       P:{
+        unoSi_OCeroSiNo:"def unoSi_OCeroSiNo(condición):\n  return 1 if condición else 0",
+        singular_Si_:"def singular_Si_(elemento, condición):\n return [elemento] if condición else []",
         Color:"",
         minColor:"",
         maxColor:"",
@@ -52,6 +55,8 @@
         dirSiguiente:""
       },
       J:{
+        unoSi_OCeroSiNo:"function unoSi_OCeroSiNo(condición) {\n  return condición ? 1 : 0;\n}",
+        singular_Si_:"function singular_Si_(elemento, condición) {\n  return condición ? [elemento] : [];\n}",
         Color:"",
         minColor:"",
         maxColor:"",
@@ -67,255 +72,562 @@
     };
     const codigosTipo = {
       G:{
-        P:{E:"%{I}while(%{E}){\n  %{P}\n%{N}%{B}",
-            P:"%{S}(%{A})"},
-        Pf:{E:"%{I}foreach %{F} {\n  %{P}\n%{N}%{B}",
-            P:"%{S}(%{A})"},
-        A:{E:"%{I}contador := 0\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador := contador + %{S}(%{A})", R:"return(contador)"},
-        Af:{E:"%{I}contador := 0\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador := contador + %{S}(%{A})", R:"return(contador)"},
-        AC:{E:"%{I}contador := 0\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador := contador + unoSi_OCeroSiNo(%{S}(%{A}))", R:"return(contador)", bib:["unoSi_OCeroSiNo"]},
-        ACf:{E:"%{I}contador := 0\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador := contador + unoSi_OCeroSiNo(%{S}(%{A}))", R:"return(contador)", bib:["unoSi_OCeroSiNo"]},
-        B:{E:"%{I}while(%{E} && not %{S}(%{A})){\n%{N}%{R}",
-            R:"return(%{R})"},
-        BS:{E:"%{I}while(not %{S}(%{A})){\n%{N}%{R}",
-            R:"return(%{A})"},
-        M:{E:"%{I}mejorPorAhora := %{A}\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
-            P:"mejorPorAhora := %{S}(mejorPorAhora, %{A})", R:"return(mejorPorAhora)"},
-        Mf:{E:"%{I}mejorPorAhora := %{H}\nforeach %{T} {\n  %{P}\n%{N}%{B}%{R}",
-            P:"mejorPorAhora := %{S}(mejorPorAhora, %{A})", R:"return(mejorPorAhora)"},
-        T:{E:"%{I}listaTransformadaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+        P:{
+          w:{
+            E:"%{I}while(%{E}){\n  %{P}\n%{N}%{B}",
+            P:"%{S}(%{A})"
+          },
+          f:{
+            E:"%{I}foreach %{F} {\n  %{P}\n%{N}%{B}",
+            P:"%{S}(%{A})"
+          }
+        },
+        A:{
+          w:{
+            E:"%{I}contador := 0\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador := contador + %{S}(%{A})", R:"return(contador)"
+          },
+          f:{
+            E:"%{I}contador := 0\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador := contador + %{S}(%{A})", R:"return(contador)"
+          }
+        },
+        AC:{
+          w:{
+            E:"%{I}contador := 0\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador := contador + unoSi_OCeroSiNo(%{S}(%{A}))",
+            R:"return(contador)", bib:["unoSi_OCeroSiNo"]
+          },
+          f:{
+            E:"%{I}contador := 0\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador := contador + unoSi_OCeroSiNo(%{S}(%{A}))",
+            R:"return(contador)", bib:["unoSi_OCeroSiNo"]
+          }
+        },
+        B:{
+          w:{
+            E:"%{I}while(%{E} && not %{S}(%{A})){\n%{N}%{R}",
+            R:"return(%{R})"
+          }
+        },
+        BS:{
+          w:{
+            E:"%{I}while(not %{S}(%{A})){\n%{N}%{R}",
+            R:"return(%{A})"
+          }
+        },
+        M:{
+          w:{
+            E:"%{I}mejorPorAhora := %{A}\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora := %{S}(mejorPorAhora, %{A})", R:"return(mejorPorAhora)"
+          },
+          f:{
+            E:"%{I}mejorPorAhora := %{H}\nforeach %{T} {\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora := %{S}(mejorPorAhora, %{A})", R:"return(mejorPorAhora)"
+          }
+        },
+        T:{
+          w:{
+            E:"%{I}listaTransformadaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora := listaTransformadaPorAhora ++ [%{S}(%{A})]",
-            R:"return(listaTransformadaPorAhora)"},
-        Tf:{E:"%{I}listaTransformadaPorAhora := []\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
+            R:"return(listaTransformadaPorAhora)"
+          },
+          f:{
+            E:"%{I}listaTransformadaPorAhora := []\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora := listaTransformadaPorAhora ++ [%{S}(%{A})]",
-            R:"return(listaTransformadaPorAhora)"},
-        F:{E:"%{I}listaFiltradaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            R:"return(listaTransformadaPorAhora)"
+          }
+        },
+        F:{
+          w:{
+            E:"%{I}listaFiltradaPorAhora := []\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
             P:"listaFiltradaPorAhora := listaFiltradaPorAhora ++\n  singular_Si_(%{A}, %{S}(%{A}))",
-            R:"return(listaFiltradaPorAhora)", bib:["singular_Si_"]},
-        Ff:{E:"%{I}listaFiltradaPorAhora := []\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
+            R:"return(listaFiltradaPorAhora)", bib:["singular_Si_"]
+          },
+          f:{
+            E:"%{I}listaFiltradaPorAhora := []\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
             P:"listaFiltradaPorAhora := listaFiltradaPorAhora ++\n  singular_Si_(%{A}, %{S}(%{A}))",
-            R:"return(listaFiltradaPorAhora)", bib:["singular_Si_"]}
+            R:"return(listaFiltradaPorAhora)", bib:["singular_Si_"]
+          }
+        }
       },
       P:{
-        A:{E:"%{I}contador = 0\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador = contador + %{S}(%{A})", R:"return contador"},
-        Af:{E:"%{I}contador = 0\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
-            P:"contador = contador + %{S}(%{A})", R:"return contador"},
-        AC:{E:"%{I}contador = 0\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador = contador + (1 if %{S}(%{A}) else 0)", R:"return contador"},
-        ACf:{E:"%{I}contador = 0\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
-            P:"contador = contador + (1 if %{S}(%{A}) else 0)", R:"return contador"},
-        B:{E:"%{I}while %{E} and not %{S}(%{A}):\n%{N}%{R}",
-            R:"return %{R}"},
-        BS:{E:"%{I}while not %{S}(%{A}):\n%{N}%{R}",
-            R:"return %{A}"},
-        M:{E:"%{I}mejorPorAhora = %{A}\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
-            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A})", R:"return mejorPorAhora"},
-        Mf:{E:"%{I}mejorPorAhora = %{H}\nfor %{T}:\n  %{P}%{N}%{B}%{R}",
-            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A})", R:"return mejorPorAhora"},
-        T:{E:"%{I}listaTransformadaPorAhora = []\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
+        A:{
+          w:{
+            E:"%{I}contador = 0\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + %{S}(%{A})", R:"return contador"
+          },
+          f:{
+            E:"%{I}contador = 0\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
+            P:"contador = contador + %{S}(%{A})", R:"return contador"
+          },
+          r:{
+            E:"return %{REC}(%{T}) + %{S}(%{H}) if %{E} else 0"
+          },
+          h:{
+            E:"TODO"
+          }
+        },
+        AC:{
+          w:{
+            E:"%{I}contador = 0\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + (1 if %{S}(%{A}) else 0)", R:"return contador"
+          },
+          f:{
+            E:"%{I}contador = 0\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
+            P:"contador = contador + unoSi_OCeroSiNo(%{S}(%{A}))", R:"return contador",
+            bib:["unoSi_OCeroSiNo"]
+          },
+          r:{
+            E:"return %{REC}(%{T}) + unoSi_OCeroSiNo(%{S}(%{H})) if %{E} else 0",
+            bib:["unoSi_OCeroSiNo"]
+          },
+          h:{
+            E:"TODO"
+          }
+        },
+        B:{
+          w:{
+            E:"%{I}while %{E} and not %{S}(%{A}):\n%{N}%{R}",
+            R:"return %{R}"
+          },
+          r:{
+            E:"return %{E} and (%{S}(%{H}) or %{REC}(%{T}))"
+          },
+          h:{
+            E:"TODO"
+          }
+        },
+        BS:{
+          w:{
+            E:"%{I}while not %{S}(%{A}):\n%{N}%{R}",
+            R:"return %{A}"
+          },
+          r:{
+            EP:"if not %{S}(%{H}):\n%{N}%{REC}(%{T})",
+            EF:"return %{H} if %{S}(%{H}) else %{REC}(%{T})"
+          },
+          h:{
+            E:"TODO"
+          }
+        },
+        M:{
+          w:{
+            E:"%{I}mejorPorAhora = %{A}\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A})", R:"return mejorPorAhora"
+          },
+          f:{
+            E:"%{I}mejorPorAhora = %{H}\nfor %{T}:\n  %{P}%{N}%{B}%{R}",
+            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A})", R:"return mejorPorAhora"
+          },
+          r:{
+            E:"return %{S}(%{REC}(%{T}), %{H}) if %{Em} else %{H}"
+          },
+          h:{
+            E:"TODO"
+          }
+        },
+        T:{
+          w:{
+            E:"%{I}listaTransformadaPorAhora = []\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora.append(%{S}(%{A}))",
-            R:"return listaTransformadaPorAhora"},
-        Tf:{E:"%{I}listaTransformadaPorAhora = []\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
+            R:"return listaTransformadaPorAhora"
+          },
+          f:{
+            E:"%{I}listaTransformadaPorAhora = []\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora.append(%{S}(%{A}))",
-            R:"return listaTransformadaPorAhora"},
-        F:{E:"%{I}listaFiltradaPorAhora = []\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
+            R:"return listaTransformadaPorAhora"
+          },
+          r:{
+            E:"return %{S}(%{H}) + %{REC}(%{T}) if %{E} else []"
+          },
+          h:{
+            E:"TODO"
+          }
+        },
+        F:{
+          w:{
+            E:"%{I}listaFiltradaPorAhora = []\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
             P:"if %{S}(%{A}):\n  listaFiltradaPorAhora.append(%{A})",
-            R:"return listaFiltradaPorAhora"},
-        Ff:{E:"%{I}listaFiltradaPorAhora = []\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
+            R:"return listaFiltradaPorAhora"
+          },
+          f:{
+            E:"%{I}listaFiltradaPorAhora = []\nfor %{F}:\n  %{P}%{N}%{B}%{R}",
             P:"if %{S}(%{A}):\n  listaFiltradaPorAhora.append(%{A})",
-            R:"return listaFiltradaPorAhora"}
+            R:"return listaFiltradaPorAhora"
+          },
+          r:{
+            E:"return singular_Si_(%{H}, %{S}(%{H})) + %{REC}(%{T}) if %{E} else []",
+            bib:["singular_Si_"]
+          },
+          h:{
+            E:"TODO"
+          }
+        }
       },
       J:{
-        A:{E:"%{I}contador = 0;\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador = contador + %{S}(%{A});", R:"return contador;"},
-        Af:{E:"%{I}contador = 0;\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador = contador + %{S}(%{A});", R:"return contador;"},
-        AC:{E:"%{I}contador = 0;\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador = contador + (%{S}(%{A}) ? 1 : 0);", R:"return contador;"},
-        ACf:{E:"%{I}contador = 0;\nfor(%{E}){\n  %{P}\n%{N}%{B}%{R}",
-            P:"contador = contador + (%{S}(%{A}) ? 1 : 0);", R:"return contador;"},
-        B:{E:"%{I}while(%{E} && !%{S}(%{A})){\n%{N}%{R}",
-            R:"return %{R};"},
-        BS:{E:"%{I}while(!%{S}(%{A})){\n%{N}%{R}",
-            R:"return %{A};"},
-        M:{E:"%{I}mejorPorAhora = %{A};\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
-            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"},
-        Mf:{E:"%{I}mejorPorAhora = %{H};\nfor(%{T}){\n  %{P}\n%{N}%{B}%{R}",
-            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"},
-        T:{E:"%{I}listaTransformadaPorAhora = [];\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+        A:{
+          w:{
+            E:"%{I}contador = 0;\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + %{S}(%{A});", R:"return contador;"
+          },
+          f:{
+            E:"%{I}contador = 0;\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + %{S}(%{A});", R:"return contador;"
+          },
+          r:{
+            E:"return %{E} ? %{REC}(%{T}) + %{S}(%{H}) : 0;"
+          },
+          h:{
+            E:"TODO"
+          }
+        },
+        AC:{
+          w:{
+            E:"%{I}contador = 0;\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + unoSi_OCeroSiNo(%{S}(%{A}));", R:"return contador;",
+            bib:["unoSi_OCeroSiNo"]
+          },
+          f:{
+            E:"%{I}contador = 0;\nfor(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"contador = contador + unoSi_OCeroSiNo(%{S}(%{A}));", R:"return contador;",
+            bib:["unoSi_OCeroSiNo"]
+          },
+          r:{
+            E:"return %{E} ? %{REC}(%{T}) + unoSi_OCeroSiNo(%{S}(%{H})) : 0;",
+            bib:["unoSi_OCeroSiNo"]
+          },
+          h:{
+            E:"TODO"
+          }
+        },
+        B:{
+          w:{
+            E:"%{I}while(%{E} && !%{S}(%{A})){\n%{N}%{R}",
+            R:"return %{R};"
+          },
+          r:{
+            E:"return %{E} && (%{S}(%{H}) || %{REC}(%{T}));"
+          },
+          h:{
+            E:"TODO"
+          }
+        },
+        BS:{
+          w:{E:"%{I}while(!%{S}(%{A})){\n%{N}%{R}",
+            R:"return %{A};"
+          },
+          r:{
+            EP:"if (!%{S}(%{H})) {\n%{N}%{REC}(%{T});\n}",
+            EF:"return %{S}(%{H}) ? %{H} : %{REC}(%{T});"
+          },
+          h:{
+            E:"TODO"
+          }
+        },
+        M:{
+          w:{
+            E:"%{I}mejorPorAhora = %{A};\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"
+          },
+          f:{
+            E:"%{I}mejorPorAhora = %{H};\nfor(%{T}){\n  %{P}\n%{N}%{B}%{R}",
+            P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"
+          },
+          r:{
+            E:"return %{Em} ? %{S}(%{REC}(%{T}), %{H}) : %{H};"
+          },
+          h:{
+            E:"TODO"
+          }
+        },
+        T:{
+          w:{
+            E:"%{I}listaTransformadaPorAhora = [];\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora.push(%{S}(%{A}));",
-            R:"return listaTransformadaPorAhora;"},
-        Tf:{E:"%{I}listaTransformadaPorAhora = [];\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            R:"return listaTransformadaPorAhora;"
+          },
+          f:{
+            E:"%{I}listaTransformadaPorAhora = [];\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora.push(%{S}(%{A}));",
-            R:"return listaTransformadaPorAhora;"},
-        F:{E:"%{I}listaFiltradaPorAhora = [];\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            R:"return listaTransformadaPorAhora;"
+          },
+          r:{
+            E:"return %{E} ? %{S}(%{H}) + %{REC}(%{T}) : [];"
+          },
+          h:{
+            E:"TODO"
+          }
+        },
+        F:{
+          w:{
+            E:"%{I}listaFiltradaPorAhora = [];\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
             P:"if (%{S}(%{A})) {\n  listaFiltradaPorAhora.push(%{A});\n}",
-            R:"return listaFiltradaPorAhora;"},
-        Ff:{E:"%{I}listaFiltradaPorAhora = [];\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            R:"return listaFiltradaPorAhora;"
+          },
+          f:{
+            E:"%{I}listaFiltradaPorAhora = [];\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
             P:"if (%{S}(%{A})) {\n  listaFiltradaPorAhora.push(%{A});\n}",
-            R:"return listaFiltradaPorAhora;"}
+            R:"return listaFiltradaPorAhora;"
+          },
+          r:{
+            E:"return %{E} ? singular_Si_(%{H}, %{S}(%{H})) + %{REC}(%{T}) : [];",
+            bib:["singular_Si_"]
+          },
+          h:{
+            E:"TODO"
+          }
+        }
       },
       H:{
-        A:{E:"foldr ((+) . %{S}) 0"},
-        AC:{E:"foldr ((+) . (unoSi_OCeroSiNo . %{S})) 0",
-          bib:["unoSi_OCeroSiNo"]
+        A:{
+          r:{E:"%{REC} %{CB} = 0\n%{REC} %{CR} = %{S} %{H} + %{REC} %{T}", noname: true},
+          h:{E:"foldr ((+) . %{S}) 0"}
         },
-        B:{E:"any %{S}"},
-        BS:{E:"fromJust . find %{S}",
-          imp:["List","Maybe"]
+        AC:{
+          r:{
+            E:"%{REC} %{CB} = 0\n%{REC} %{CR} = unoSi_OCeroSiNo(%{S} %{H}) + %{REC} %{T}",
+            bib:["unoSi_OCeroSiNo"], noname: true
+          },
+          h:{E:"foldr ((+) . (unoSi_OCeroSiNo . %{S})) 0",bib:["unoSi_OCeroSiNo"]}
         },
-        M:{E:"foldr1 %{S}"},
-        T:{E:"map %{S}"},
-        F:{E:"filter %{S}"}
+        B:{
+          r:{E:"%{REC} %{CB} = False\n%{REC} %{CR} = %{S} %{H} or %{REC} %{T}", noname: true},
+          h:{E:"any %{S}"}
+        },
+        BS:{
+          r:{E:"%{REC} %{CR} = if %{S} %{H} then %{H} else %{REC} %{T}", noname: true},
+          h:{E:"fromJust . find %{S}", imp:["List","Maybe"]}
+        },
+        M:{
+          r:{E:"%{REC} %{CR} = if %{E} %{T} then %{H} else %{S}(%{H}, %{REC} %{T})", noname: true},
+          h:{E:"foldr1 %{S}"}
+        },
+        T:{
+          r:{E:"%{REC} %{CB} = []\n%{REC} %{CR} = %{S} %{H} : %{REC} %{T}", noname: true},
+          h:{E:"map %{S}"}
+        },
+        F:{
+          r:{E:"%{REC} %{CB} = []\n%{REC} %{CR} = if %{S} %{H} then %{H} : %{REC} %{T} else %{REC} %{T}", noname: true},
+          h:{E:"filter %{S}"}
+        }
       }
     };
     const codigosColeccion = {
       G:{
         T:{
-          I:"IrAPrimeraCeldaEnRecorridoAl_YAl_(Este, Norte)",
-          E:"haySiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
-          N:"PasarASiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
-          R:"%{S}(%{A})",
-          B:true
+          w:{
+            I:"IrAPrimeraCeldaEnRecorridoAl_YAl_(Este, Norte)",
+            E:"haySiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
+            N:"PasarASiguienteCeldaEnRecorridoAl_YAl_(Este, Norte)",
+            R:"%{S}(%{A})",
+            B:true
+          }
         },
         C:{
-          A:"colorActual",
-          I:"colorActual := minColor()",
-          E:"colorActual /= maxColor()",
-          N:"colorActual := siguiente(colorActual)",
-          R:"%{S}(%{A})",
-          B:true
+          w:{
+            A:"colorActual",
+            I:"colorActual := minColor()",
+            E:"colorActual /= maxColor()",
+            N:"colorActual := siguiente(colorActual)",
+            R:"%{S}(%{A})",
+            B:true
+          }
         },
         D:{
-          A:"direcciónActual",
-          I:"direcciónActual := minDir()",
-          E:"direcciónActual /= maxDir()",
-          N:"direcciónActual := siguiente(direcciónActual)",
-          R:"%{S}(%{A})",
-          B:true
+          w:{
+            A:"direcciónActual",
+            I:"direcciónActual := minDir()",
+            E:"direcciónActual /= maxDir()",
+            N:"direcciónActual := siguiente(direcciónActual)",
+            R:"%{S}(%{A})",
+            B:true
+          }
         },
         L:{
-          A:"primero(listaRestante)",
-          I:"listaRestante := listaCompleta",
-          E:"not esVacía(listaRestante)",
-          N:"listaRestante := resto(listaRestante)",
-          R:"not esVacía(listaRestante)",
-          B:false
-        },
-        Lf:{
-          A:"elementoActual",
-          F:"elementoActual in listaCompleta",
-          H:"primero(listaCompleta)",
-          T:"elementoActual in resto(listaCompleta)",
-          B:false
+          w:{
+            A:"primero(listaRestante)",
+            I:"listaRestante := listaCompleta",
+            E:"not esVacía(listaRestante)",
+            N:"listaRestante := resto(listaRestante)",
+            R:"not esVacía(listaRestante)",
+            B:false
+          },
+          f:{
+            A:"elementoActual",
+            F:"elementoActual in listaCompleta",
+            H:"primero(listaCompleta)",
+            T:"elementoActual in resto(listaCompleta)",
+            B:false
+          }
         },
         N:{
-          A:"i",
-          I:"i := 0",
-          N:"i := i+1",
+          w:{
+            A:"i",
+            I:"i := 0",
+            N:"i := i+1",
+          }
         }
       },
       P:{
         C:{
-          A:"colorActual",
-          I:"colorActual = minColor()",
-          E:"colorActual != maxColor()",
-          N:"colorActual = colorSiguiente(colorActual)",
-          R:"%{S}(%{A})",
-          B:true,
-          bib:["Color","minColor","maxColor","colorSiguiente"]
+          w:{
+            A:"colorActual",
+            I:"colorActual = minColor()",
+            E:"colorActual != maxColor()",
+            N:"colorActual = colorSiguiente(colorActual)",
+            R:"%{S}(%{A})",
+            B:true,
+            bib:["Color","minColor","maxColor","colorSiguiente"]
+          }
         },
         D:{
-          A:"direcciónActual",
-          I:"direcciónActual = minDir()",
-          E:"direcciónActual != maxDir()",
-          N:"direcciónActual = dirSiguiente(direcciónActual)",
-          R:"%{S}(%{A})",
-          B:true,
-          bib:["Dir","minDir","maxDir","dirSiguiente"]
+          w:{
+            A:"direcciónActual",
+            I:"direcciónActual = minDir()",
+            E:"direcciónActual != maxDir()",
+            N:"direcciónActual = dirSiguiente(direcciónActual)",
+            R:"%{S}(%{A})",
+            B:true,
+            bib:["Dir","minDir","maxDir","dirSiguiente"]
+          }
         },
         L:{
-          A:"listaRestante[0]",
-          I:"listaRestante = listaCompleta",
-          E:"len(listaRestante) > 0",
-          N:"listaRestante = listaRestante[1:]",
-          R:"len(listaRestante) > 0",
-          B:false
-        },
-        Lf:{
-          A:"elementoActual",
-          F:"elementoActual in listaCompleta",
-          H:"listaCompleta[0]",
-          T:"elementoActual in listaCompleta[1:]",
-          B:false
+          w:{
+            A:"listaRestante[0]",
+            I:"listaRestante = listaCompleta",
+            E:"len(listaRestante) > 0",
+            N:"listaRestante = listaRestante[1:]",
+            R:"len(listaRestante) > 0",
+            B:false
+          },
+          f:{
+            A:"elementoActual",
+            F:"elementoActual in listaCompleta",
+            H:"listaCompleta[0]",
+            T:"elementoActual in listaCompleta[1:]",
+            B:false
+          },
+          r:{
+            E:"len(lista) > 0",
+            Em:"len(lista) > 1",
+            H:"lista[0]",
+            T:"lista[1:]",
+            B:false
+          },
+          h:{
+            // TODO
+          }
         },
         N:{
-          A:"i",
-          I:"i = 0",
-          N:"i = i+1",
+          w:{
+            A:"i",
+            I:"i = 0",
+            N:"i = i+1",
+          }
         }
       },
       J:{
         C:{
-          A:"colorActual",
-          I:"let colorActual = minColor();",
-          E:"colorActual != maxColor()",
-          N:"colorActual = siguiente(colorActual);",
-          R:"%{S}(%{A})",
-          B:true,
-          bib:["Color","minColor","maxColor","colorSiguiente"]
+          w:{
+            A:"colorActual",
+            I:"let colorActual = minColor();",
+            E:"colorActual != maxColor()",
+            N:"colorActual = siguiente(colorActual);",
+            R:"%{S}(%{A})",
+            B:true,
+            bib:["Color","minColor","maxColor","colorSiguiente"]
+          }
         },
         D:{
-          A:"direcciónActual",
-          I:"let direcciónActual = minDir();",
-          E:"direcciónActual != maxDir()",
-          N:"direcciónActual = dirSiguiente(direcciónActual);",
-          R:"%{S}(%{A})",
-          B:true,
-          bib:["Dir","minDir","maxDir","dirSiguiente"]
+          w:{
+            A:"direcciónActual",
+            I:"let direcciónActual = minDir();",
+            E:"direcciónActual != maxDir()",
+            N:"direcciónActual = dirSiguiente(direcciónActual);",
+            R:"%{S}(%{A})",
+            B:true,
+            bib:["Dir","minDir","maxDir","dirSiguiente"]
+          }
         },
         L:{
-          A:"listaRestante[0]",
-          I:"let listaRestante = listaCompleta;",
-          E:"listaRestante.length > 0",
-          N:"listaRestante = listaRestante.slice(1);",
-          R:"listaRestante.length > 0",
-          B:false
-        },
-        Lf:{
-          A:"elementoActual",
-          F:"elementoActual of listaCompleta",
-          H:"listaCompleta[0]",
-          T:"elementoActual of listaCompleta.slice(1)",
-          B:false
+          w:{
+            A:"listaRestante[0]",
+            I:"let listaRestante = listaCompleta;",
+            E:"listaRestante.length > 0",
+            N:"listaRestante = listaRestante.slice(1);",
+            R:"listaRestante.length > 0",
+            B:false
+          },
+          f:{
+            A:"elementoActual",
+            F:"elementoActual of listaCompleta",
+            H:"listaCompleta[0]",
+            T:"elementoActual of listaCompleta.slice(1)",
+            B:false
+          },
+          r:{
+            E:"lista.length > 0",
+            Em:"lista.length > 1",
+            H:"lista[0]",
+            T:"lista.slice(1)",
+            B:false
+          },
+          h:{
+            // TODO
+          }
         },
         N:{
-          A:"i",
-          I:"let i = 0;",
-          N:"i = i+1;",
+          w:{
+            A:"i",
+            I:"let i = 0;",
+            N:"i = i+1;",
+          }
         }
       },
-      H:{L:{}}
+      H:{
+        L:{
+          r:{
+            E: "null",
+            CB:"[]",
+            CR:"(x:xs)",
+            H:"x",
+            T:"xs"
+          },
+          h:{}
+        }
+      }
     };
     const codigosOtros = {
-      G:{AD:"() {\n  ", CD:"\n}", AC:"/*", CC:"*/", P:"procedure ", F:"function "},
-      P:{AD:"():\n  ", AC:"'''", CC:"'''", P:"def ", F:"def "},
-      J:{AD:"() {\n  ", CD:"\n}", AC:"/*", CC:"*/", P:"function ", F:"function "},
-      H:{AD:" = ", CD:"", AC:"{--", CC:"--}", F:""}
+      G:{
+        AD:"() {\n  ", CD:"\n}", AC:"/*", CC:"*/",
+        P:"procedure ", F:"function ",
+        mecanismos: ["w","f"]
+      },
+      P:{
+        AD:"():\n  ", AC:"'''", CC:"'''",
+        P:"def ", F:"def ",
+        mecanismos: ["w","f","r","h"]
+      },
+      J:{
+        AD:"() {\n  ", CD:"\n}", AC:"/*", CC:"*/",
+        P:"function ", F:"function ",
+        mecanismos: ["w","f","r","h"]
+      },
+      H:{
+        AD:" = ", CD:"", AC:"{--", CC:"--}",
+        F:"",
+        mecanismos: ["r","h"]
+      }
     };
 
     const selectorLenguaje = document.getElementById("selectorLenguaje");
     const selectorClase = document.getElementById("selectorClase");
     const selectorNombre = document.getElementById("selectorNombre");
     const selectorTipo = document.getElementById("selectorTipo");
-    const selectorColeccion = document.getElementById("selectorColección");
+    const selectorColeccion = document.getElementById("selectorColeccion");
     const selectorSubtarea = document.getElementById("selectorSubtarea");
-    const selectorForeach = document.getElementById("selectorForeach");
+    const selectorMecanismo = document.getElementById("selectorMecanismo");
     const output = document.getElementById("output");
     const abrirDefinicion = document.getElementById("abrirDefinición");
     const cerrarDefinicion = document.getElementById("cerrarDefinición");
@@ -332,7 +644,20 @@
       }, validaciones:{
         clase: (v) => ((x) => x in codigosOtros[v]),
         tipo: (v) => ((x) => x in codigosTipo[v]),
-        colección: (v) => ((x) => x in codigosColeccion[v])
+        coleccion: (v) => ((x) => x in codigosColeccion[v]),
+        mecanismo: (v) => ((x) => codigosOtros[v].mecanismos.includes(x))
+      }},
+      {name:"mecanismo", selector: selectorMecanismo, opciones:[
+        {k:"w", n:"Repetición condicional"},
+        {k:"f", n:"Repetición indexada"},
+        {k:"r", n:"Recursión"},
+        {k:"h", n:"Alto orden"}
+      ], title: "el mecanismo de", error: function(src, actual) {
+        return `El mecanismo de ${actual} no está disponible para ${src.opt} ${src.name}`
+      }, validaciones:{
+        lenguaje: (v) => ((x) => codigosOtros[x].mecanismos.includes(v)),
+        coleccion: (v) => ((x) => mecanismosPorColeccion[x].includes(v)),
+        tipo: (v) => ((x) => v != "f" || (v == "f" && !["B","BS"].includes(x)))
       }},
       {name:"clase", selector: selectorClase, opciones:[
         {k:"P", n:"procedimiento"},
@@ -341,7 +666,7 @@
         return `Un ${actual} no se puede definir con ${src.opt} ${src.name}`
       }, validaciones:{
         lenguaje: (v) => ((x) => v in codigosOtros[x]),
-        tipo: (v) => ((x) => v == "P" || x != "P")
+        tipo: (v) => ((x) => (v == "P" && ["P","BS"].includes(x)) || (v == "F" && x != "P"))
       }},
       {name:"tipo", selector: selectorTipo, opciones:[
         {k:"P", n:"procesamiento"},
@@ -356,20 +681,32 @@
         return `El esquema de recorrido de ${actual} no se puede realizar con ${src.opt} ${src.name}`
       }, validaciones:{
         lenguaje: (v) => ((x) => v in codigosTipo[x]),
-        colección: (v) => ((x) => tiposPorColeccion[x].includes(v)),
-        clase: (v) => ((x) => x == "P" || v != "P")
+        coleccion: (v) => ((x) => tiposPorColeccion[x].includes(v)),
+        clase: (v) => ((x) => (x == "P" && ["P","BS"].includes(v)) || (x == "F" && v != "P")),
+        mecanismo: (v) => ((x) => x != "f" || (x == "f" && !["B","BS"].includes(v)))
       }},
-      {name:"colección", selector: selectorColeccion, opciones:[
-        {k:"T", n:"el tablero", tipos:["P","A","AC","B","BS","M"]},
-        {k:"C", n:"los colores", tipos:["P","A","AC","B","BS","M"]},
-        {k:"D", n:"las direcciones", tipos:["P","A","AC","B","BS","M"]},
-        {k:"L", n:"una lista", tipos:["P","A","AC","B","BS","M","T","F"]},
-        {k:"N", n:"los números naturales", tipos:["BS"]}
+      {name:"coleccion", selector: selectorColeccion, opciones:[
+        {k:"T", n:"el tablero",
+          tipos:["P","A","AC","B","BS","M"], mecanismos:["w"]
+        },
+        {k:"C", n:"los colores",
+          tipos:["P","A","AC","B","BS","M"], mecanismos:["w"]
+        },
+        {k:"D", n:"las direcciones",
+          tipos:["P","A","AC","B","BS","M"], mecanismos:["w"]
+        },
+        {k:"L", n:"una lista",
+          tipos:["P","A","AC","B","BS","M","T","F"], mecanismos:["w","f","r","h"]
+        },
+        {k:"N", n:"los números naturales",
+          tipos:["BS"], mecanismos:["w"]
+        }
       ], title:"la colección", error: function(src, actual) {
         return `La colección ${actual} no se puede recorrer con ${src.opt} ${src.name}`
       }, validaciones:{
         lenguaje: (v) => ((x) => v in codigosColeccion[x]),
-        tipo: (v) => ((x) => tiposPorColeccion[v].includes(x))
+        tipo: (v) => ((x) => tiposPorColeccion[v].includes(x)),
+        mecanismo: (v) => ((x) => mecanismosPorColeccion[v].includes(x))
       }}
     ];
     const datosDeOpcion = function(objeto, clave, nombre) {
@@ -443,16 +780,12 @@
       let claveTipo = selectorTipo.value;
       let claveColeccion = selectorColeccion.value;
       const subtarea = selectorSubtarea.value;
-      const usarForeach = selectorForeach.checked;
+      const mecanismo = selectorMecanismo.value;
       const otros = codigosOtros[lenguaje];
       let bibliotecas = [];
       let modulos = [];
-      if (usarForeach && `${claveTipo}f` in codigosTipo[lenguaje] && `${claveColeccion}f` in codigosColeccion[lenguaje]) {
-        claveTipo = `${claveTipo}f`;
-        claveColeccion = `${claveColeccion}f`;
-      }
-      const tipo = codigosTipo[lenguaje][claveTipo];
-      const coleccion = codigosColeccion[lenguaje][claveColeccion];
+      const tipo = codigosTipo[lenguaje][claveTipo][mecanismo];
+      const coleccion = codigosColeccion[lenguaje][claveColeccion][mecanismo];
       if ('bib' in tipo) {
         bibliotecas = bibliotecas.concat(tipo.bib).map(x => codigosBiblioteca[lenguaje][x]);
       }
@@ -475,9 +808,16 @@
       } else {
         modulos = "";
       }
-      output.value = modulos + otros[clase] + nombre + otros.AD + tipo.E
+      let esquema = (
+        `E${clase}` in tipo
+        ? tipo[`E${clase}`]
+        : tipo.E
+      );
+      let encabezado = ('noname' in tipo ? '' : otros[clase] + nombre + otros.AD);
+      output.value = modulos + encabezado + esquema
         .replace("%{I}", coleccion.I ? coleccion.I + '\n' : '')
         .replace("%{E}", (coleccion.E || 'true'))
+        .replace("%{Em}", (coleccion.Em || 'true'))
         .replace("%{N}",
           (coleccion.N ? "  " + coleccion.N : '') +
           ((coleccion.N && otros.CD) ? '\n' : '') + 
@@ -492,7 +832,10 @@
         .replaceAll("%{A}", (coleccion.A || ''))
         .replaceAll("%{H}", coleccion.H || '')
         .replaceAll("%{T}", coleccion.T || '')
-        .replaceAll('\n', "\n  ")
+        .replaceAll("%{CB}", coleccion.CB || '')
+        .replaceAll("%{CR}", coleccion.CR || '')
+        .replaceAll("%{REC}", nombre || '')
+        .replaceAll('\n', ('noname' in tipo ? '\n' : "\n  "))
       + (otros.CD || '') + bibliotecas;
       abrirDefinicion.innerHTML = otros.AD;
       cerrarDefinicion.innerHTML = (otros.CD || '');
@@ -500,8 +843,12 @@
       cerrarComentario.innerHTML = otros.CC;
     };
     const tiposPorColeccion = {};
-    for (let c of datosDeOpcion(opciones, "name", "colección").opciones) {
+    for (let c of datosDeOpcion(opciones, "name", "coleccion").opciones) {
       tiposPorColeccion[c.k] = c.tipos;
+    }
+    const mecanismosPorColeccion = {};
+    for (let c of datosDeOpcion(opciones, "name", "coleccion").opciones) {
+      mecanismosPorColeccion[c.k] = c.mecanismos;
     }
     selectorLenguaje.onchange = actualizarOutput;
     selectorClase.onchange = actualizarOutput;
@@ -509,24 +856,44 @@
     selectorTipo.onchange = actualizarOutput;
     selectorColeccion.onchange = actualizarOutput;
     selectorSubtarea.onchange = actualizarOutput;
-    selectorForeach.onchange = actualizarOutput;
-    const inicializacion = {
-      "lenguaje":"G",
-      "clase":"P",
-      "tipo":"P",
-      "colección":"T"
+    selectorMecanismo.onchange = actualizarOutput;
+    const argumentoURL = function(clave) {
+      let url = location.href;
+      clave = clave.replace(/[\[]/,"\\[").replace(/[\]]/,"\\]");
+      let regexS = "[\\?&]"+clave+"=([^&#]*)";
+      let regex = new RegExp( regexS );
+      let results = regex.exec( url );
+      return results == null ? null : results[1];
     };
-    for (let s in inicializacion) {
-      let datos = datosDeOpcion(opciones, "name", s)
-      let contenido = "";
-      for (let o of datos.opciones) {
-        contenido += `<option value="${o.k}"${contenido.length == 0 ? ' selected' : ''}>${o.n}</option>`;
+    window.onerror = function(msg, url, line, col, error) {
+      alert(" -- ERROR --\n\n" + msg);
+    }
+    window.onload = function() {
+      const inicializacion = {
+        "lenguaje":"G",
+        "mecanismo":"w",
+        "clase":"P",
+        "tipo":"P",
+        "coleccion":"T"
+      };
+      for (let s in inicializacion) {
+        let v = argumentoURL(s);
+        if (v != null) {
+          inicializacion[s] = v;
+        }
       }
-      datos.selector.innerHTML = contenido;
-    }
-    for (let s in inicializacion) {
-      actualizarOpciones({target:{getAttribute:x=>s, value:inicializacion[s]}});
-    }
-    actualizarOutput();
+      for (let s in inicializacion) {
+        let datos = datosDeOpcion(opciones, "name", s)
+        let contenido = "";
+        for (let o of datos.opciones) {
+          contenido += `<option value="${o.k}"${o.k == inicializacion[s] ? ' selected' : ''}>${o.n}</option>`;
+        }
+        datos.selector.innerHTML = contenido;
+      }
+      for (let s in inicializacion) {
+        actualizarOpciones({target:{getAttribute:x=>s, value:inicializacion[s]}});
+      }
+      actualizarOutput();
+    };
   </script>
 </html>
