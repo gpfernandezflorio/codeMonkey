@@ -102,7 +102,7 @@
             P:"%{S}(%{A})"
           },
           f:{
-            E:"%{I}foreach %{F} {\n  %{P}\n%{N}%{B}",
+            E:"%{I}foreach %{F} {\n  %{P}%{N}%{B}",
             P:"%{S}(%{A})"
           }
         },
@@ -112,7 +112,7 @@
             P:"contador := contador + %{S}(%{A})", R:"return(contador)"
           },
           f:{
-            E:"%{I}contador := 0\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}contador := 0\nforeach %{F} {\n  %{P}%{N}%{B}%{R}",
             P:"contador := contador + %{S}(%{A})", R:"return(contador)"
           }
         },
@@ -123,7 +123,7 @@
             R:"return(contador)", bib:["unoSi_OCeroSiNo"]
           },
           f:{
-            E:"%{I}contador := 0\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}contador := 0\nforeach %{F} {\n  %{P}%{N}%{B}%{R}",
             P:"contador := contador + unoSi_OCeroSiNo(%{S}(%{A}))",
             R:"return(contador)", bib:["unoSi_OCeroSiNo"]
           }
@@ -146,7 +146,7 @@
             P:"mejorPorAhora := %{S}(mejorPorAhora, %{A})", R:"return(mejorPorAhora)"
           },
           f:{
-            E:"%{I}mejorPorAhora := %{H}\nforeach %{T} {\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}mejorPorAhora := %{H}\nforeach %{T} {\n  %{P}%{N}%{B}%{R}",
             P:"mejorPorAhora := %{S}(mejorPorAhora, %{A})", R:"return(mejorPorAhora)"
           }
         },
@@ -157,7 +157,7 @@
             R:"return(listaTransformadaPorAhora)"
           },
           f:{
-            E:"%{I}listaTransformadaPorAhora := []\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}listaTransformadaPorAhora := []\nforeach %{F} {\n  %{P}%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora := listaTransformadaPorAhora ++ [%{S}(%{A})]",
             R:"return(listaTransformadaPorAhora)"
           }
@@ -169,13 +169,30 @@
             R:"return(listaFiltradaPorAhora)", bib:["singular_Si_"]
           },
           f:{
-            E:"%{I}listaFiltradaPorAhora := []\nforeach %{F} {\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}listaFiltradaPorAhora := []\nforeach %{F} {\n  %{P}%{N}%{B}%{R}",
             P:"listaFiltradaPorAhora := listaFiltradaPorAhora ++\n  singular_Si_(%{A}, %{S}(%{A}))",
             R:"return(listaFiltradaPorAhora)", bib:["singular_Si_"]
           }
         }
       },
       P:{
+        P:{
+          w:{
+            E:"%{I}while %{E}:\n  %{P}\n%{N}%{B}",
+            P:"%{S}(%{A})"
+          },
+          f:{
+            E:"%{I}for %{F}:\n  %{P}%{N}%{B}",
+            P:"%{S}(%{A})"
+          },
+          r:{
+            E:"if %{E}:\n  %{P}\n  %{REC}(%{T})",
+            P:"%{S}(%{A})"
+          },
+          h:{
+            E:"TODO"
+          }
+        },
         A:{
           w:{
             E:"%{I}contador = 0\nwhile %{E}:\n  %{P}\n%{N}%{B}%{R}",
@@ -290,13 +307,30 @@
         }
       },
       J:{
+        P:{
+          w:{
+            E:"%{I}while(%{E}){\n  %{P}\n%{N}%{B}",
+            P:"%{S}(%{A})"
+          },
+          f:{
+            E:"%{I}for(%{F}) {\n  %{P}%{N}%{B}",
+            P:"%{S}(%{A})"
+          },
+          r:{
+            E:"if (%{E}) {\n  %{P}\n  %{REC}(%{T});\n}",
+            P:"%{S}(%{A})"
+          },
+          h:{
+            E:"TODO"
+          }
+        },
         A:{
           w:{
             E:"%{I}contador = 0;\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
             P:"contador = contador + %{S}(%{A});", R:"return contador;"
           },
           f:{
-            E:"%{I}contador = 0;\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}contador = 0;\nfor(%{F}){\n  %{P}%{N}%{B}%{R}",
             P:"contador = contador + %{S}(%{A});", R:"return contador;"
           },
           r:{
@@ -313,7 +347,7 @@
             bib:["unoSi_OCeroSiNo"]
           },
           f:{
-            E:"%{I}contador = 0;\nfor(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}contador = 0;\nfor(%{E}){\n  %{P}%{N}%{B}%{R}",
             P:"contador = contador + unoSi_OCeroSiNo(%{S}(%{A}));", R:"return contador;",
             bib:["unoSi_OCeroSiNo"]
           },
@@ -355,7 +389,7 @@
             P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"
           },
           f:{
-            E:"%{I}mejorPorAhora = %{H};\nfor(%{T}){\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}mejorPorAhora = %{H};\nfor(%{T}){\n  %{P}%{N}%{B}%{R}",
             P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"
           },
           r:{
@@ -372,7 +406,7 @@
             R:"return listaTransformadaPorAhora;"
           },
           f:{
-            E:"%{I}listaTransformadaPorAhora = [];\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}listaTransformadaPorAhora = [];\nfor(%{F}){\n  %{P}%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora.push(%{S}(%{A}));",
             R:"return listaTransformadaPorAhora;"
           },
@@ -390,7 +424,7 @@
             R:"return listaFiltradaPorAhora;"
           },
           f:{
-            E:"%{I}listaFiltradaPorAhora = [];\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}listaFiltradaPorAhora = [];\nfor(%{F}){\n  %{P}%{N}%{B}%{R}",
             P:"if (%{S}(%{A})) {\n  listaFiltradaPorAhora.push(%{A});\n}",
             R:"return listaFiltradaPorAhora;"
           },
@@ -404,13 +438,27 @@
         }
       },
       C:{
+        P:{
+          w:{
+            E:"%{I}while(%{E}){\n  %{P}\n%{N}%{B}",
+            P:"%{S}(%{A})"
+          },
+          f:{
+            E:"%{I}for(%{F}) {\n  %{P}%{N}%{B}",
+            P:"%{S}(%{A})"
+          },
+          r:{
+            E:"if (%{E}) {\n  %{P}\n  %{REC}(%{T});\n}",
+            P:"%{S}(%{A})"
+          }
+        },
         A:{
           w:{
             E:"%{I}int contador = 0;\nwhile(%{E}){\n  %{P}\n%{N}%{B}%{R}",
             P:"contador = contador + %{S}(%{A});", R:"return contador;"
           },
           f:{
-            E:"%{I}int contador = 0;\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}int contador = 0;\nfor(%{F}){\n  %{P}%{N}%{B}%{R}",
             P:"contador = contador + %{S}(%{A});", R:"return contador;"
           },
           r:{
@@ -424,7 +472,7 @@
             bib:["unoSi_OCeroSiNo"]
           },
           f:{
-            E:"%{I}int contador = 0;\nfor(%{E}){\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}int contador = 0;\nfor(%{E}){\n  %{P}%{N}%{B}%{R}",
             P:"contador = contador + unoSi_OCeroSiNo(%{S}(%{A}));", R:"return contador;",
             bib:["unoSi_OCeroSiNo"]
           },
@@ -457,7 +505,7 @@
             P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"
           },
           f:{
-            E:"%{I}type mejorPorAhora = %{H};\nfor(%{T}){\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}type mejorPorAhora = %{H};\nfor(%{T}){\n  %{P}%{N}%{B}%{R}",
             P:"mejorPorAhora = %{S}(mejorPorAhora, %{A});", R:"return mejorPorAhora;"
           },
           r:{
@@ -471,7 +519,7 @@
             R:"return listaTransformadaPorAhora;"
           },
           f:{
-            E:"%{I}vector<type> listaTransformadaPorAhora = {};\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}vector<type> listaTransformadaPorAhora = {};\nfor(%{F}){\n  %{P}%{N}%{B}%{R}",
             P:"listaTransformadaPorAhora.push_back(%{S}(%{A}));",
             R:"return listaTransformadaPorAhora;"
           },
@@ -486,7 +534,7 @@
             R:"return listaFiltradaPorAhora;"
           },
           f:{
-            E:"%{I}vector<type> listaFiltradaPorAhora = {};\nfor(%{F}){\n  %{P}\n%{N}%{B}%{R}",
+            E:"%{I}vector<type> listaFiltradaPorAhora = {};\nfor(%{F}){\n  %{P}%{N}%{B}%{R}",
             P:"if (%{S}(%{A})) {\n  listaFiltradaPorAhora.push_back(%{A});\n}",
             R:"return listaFiltradaPorAhora;"
           },
@@ -1064,8 +1112,9 @@
         .replace("%{Em}", (coleccion.Em || 'true'))
         .replace("%{N}",
           (coleccion.N ? "  " + coleccion.N : '') +
-          ((coleccion.N && otros.CD) ? '\n' : '') + 
-          (otros.CD || ''))
+          // (('N' in coleccion && 'CD' in otros) ? '\n' : '') +
+          (otros.CD || '')
+        )
         .replace("%{R}", (tipo.R && clase == 'F') ?
           ('\n' + tipo.R.replace("%{R}", (coleccion.R || ''))) : ''
         )
