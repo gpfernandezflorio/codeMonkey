@@ -30,6 +30,12 @@
   <br/>
   <textarea id="output" style="width:100%;height:50%;" readonly></textarea>
   <script>
+    const codigosImport = {
+      H:{
+        List:"import Data.List",
+        Maybe:"import Data.Maybe"
+      }
+    };
     const codigosBiblioteca = {
       G:{
         unoSi_OCeroSiNo:"function unoSi_OCeroSiNo(condición) {\n  return (choose 1 when (condición)\n                 0 otherwise)\n}",
@@ -54,6 +60,9 @@
         minDir:"",
         maxDir:"",
         dirSiguiente:""
+      },
+      H:{
+        unoSi_OCeroSiNo:"unoSi_OCeroSiNo condición = if condición then 1 else 0"
       }
     };
     const codigosTipo = {
@@ -152,13 +161,17 @@
             R:"return listaFiltradaPorAhora;"}
       },
       H:{
-        A:{E:"foldr ((+) . %{S}) 0 listaCompleta"},
-        AC:{E:"foldr ((+) . (unoSi_CeroSiNo . %{S})) 0 listaCompleta"},
-        B:{E:"any %{S} listaCompleta"},
-        BS:{E:"find %{S} listaCompleta"},
-        M:{E:"foldr1 listaCompleta %{S}"},
-        T:{E:"map listaCompleta %{S}"},
-        F:{E:"filter listaCompleta %{S}"}
+        A:{E:"foldr ((+) . %{S}) 0"},
+        AC:{E:"foldr ((+) . (unoSi_OCeroSiNo . %{S})) 0",
+          bib:["unoSi_OCeroSiNo"]
+        },
+        B:{E:"any %{S}"},
+        BS:{E:"fromJust . find %{S}",
+          imp:["List","Maybe"]
+        },
+        M:{E:"foldr1 %{S}"},
+        T:{E:"map %{S}"},
+        F:{E:"filter %{S}"}
       }
     };
     const codigosColeccion = {
@@ -433,6 +446,7 @@
       const usarForeach = selectorForeach.checked;
       const otros = codigosOtros[lenguaje];
       let bibliotecas = [];
+      let modulos = [];
       if (usarForeach && `${claveTipo}f` in codigosTipo[lenguaje] && `${claveColeccion}f` in codigosColeccion[lenguaje]) {
         claveTipo = `${claveTipo}f`;
         claveColeccion = `${claveColeccion}f`;
@@ -447,8 +461,21 @@
       }
       if (bibliotecas.length > 0) {
         bibliotecas = "\n\n" + bibliotecas.join("\n\n");
+      } else {
+        bibliotecas = "";
       }
-      output.value = otros[clase] + nombre + otros.AD + tipo.E
+      if ('imp' in tipo) {
+        modulos = modulos.concat(tipo.imp).map(x => codigosImport[lenguaje][x]);
+      }
+      if ('imp' in coleccion) {
+        modulos = modulos.concat(coleccion.imp).map(x => codigosImport[lenguaje][x]);
+      }
+      if (modulos.length > 0) {
+        modulos = modulos.join("\n") + "\n\n";
+      } else {
+        modulos = "";
+      }
+      output.value = modulos + otros[clase] + nombre + otros.AD + tipo.E
         .replace("%{I}", coleccion.I ? coleccion.I + '\n' : '')
         .replace("%{E}", (coleccion.E || 'true'))
         .replace("%{N}",
