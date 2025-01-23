@@ -38,7 +38,8 @@
       P:{
         Enum:"from enum import Enum",
         Color:"class Color(Enum):\n  Azul = 1\n  Negro = 2\n  Rojo = 3\n  Verde = 4",
-        Dir:"class Dirección(Enum):\n  Norte = 1\n  Este = 2\n  Sur = 3\n  Oeste = 4"
+        Dir:"class Dirección(Enum):\n  Norte = 1\n  Este = 2\n  Sur = 3\n  Oeste = 4",
+        Func:"from functools import reduce"
       },
       J:{
         Color:"const Color = {\n  Azul: Symbol('Azul'),\n  Negro: Symbol('Negro'),\n  Rojo: Symbol('Rojo'),\n  Verde: Symbol('Verde')\n};\nObject.freeze(Color);",
@@ -60,6 +61,7 @@
         singular_Si_:"function singular_Si_(elemnto, condición) {\n  return (choose [elemento] when (condición)\n                 [] otherwise)\n}"
       },
       P:{
+        suma:"def suma(x,y):\n  return x+y",
         unoSi_OCeroSiNo:"def unoSi_OCeroSiNo(condición):\n  return 1 if condición else 0",
         singular_Si_:"def singular_Si_(elemento, condición):\n return [elemento] if condición else []",
         minColor:"def minColor():\n  return Color.Azul",
@@ -70,6 +72,7 @@
         dirSiguiente:"def dirSiguiente(dirección):\n  match dirección:\n    case Dirección.Norte:\n      return Dirección.Este\n    case Dirección.Este:\n      return Dirección.Sur\n    case Dirección.Sur:\n      return Dirección.Oeste"
       },
       J:{
+        suma:"function suma(x,y){\n  return x+y;\n}",
         unoSi_OCeroSiNo:"function unoSi_OCeroSiNo(condición) {\n  return condición ? 1 : 0;\n}",
         singular_Si_:"function singular_Si_(elemento, condición) {\n  return condición ? [elemento] : [];\n}",
         minColor:"function minColor() {\n  return Color.Azul;\n}",
@@ -190,7 +193,7 @@
             P:"%{S}(%{A})"
           },
           h:{
-            E:"TODO"
+            E:"list(map(%{S}, %{E}))"
           }
         },
         A:{
@@ -206,7 +209,9 @@
             E:"return %{REC}(%{T}) + %{S}(%{H}) if %{E} else 0"
           },
           h:{
-            E:"TODO"
+            E:"return reduce(suma, list(map(%{S}, %{E})), 0)",
+            imp:["Func"],
+            bib:["suma"]
           }
         },
         AC:{
@@ -225,7 +230,9 @@
             bib:["unoSi_OCeroSiNo"]
           },
           h:{
-            E:"TODO"
+            E:"return reduce(suma, list(filter(%{S}, %{E})), 0)",
+            imp:["Func"],
+            bib:["suma"]
           }
         },
         B:{
@@ -237,7 +244,7 @@
             E:"return %{E} and (%{S}(%{H}) or %{REC}(%{T}))"
           },
           h:{
-            E:"TODO"
+            E:"return any(%{S}(x) for x in %{E})"
           }
         },
         BS:{
@@ -250,7 +257,7 @@
             EF:"return %{H} if %{S}(%{H}) else %{REC}(%{T})"
           },
           h:{
-            E:"TODO"
+            E:"return next(x for x in %{E} if %{S}(x))"
           }
         },
         M:{
@@ -266,7 +273,8 @@
             E:"return %{S}(%{REC}(%{T}), %{H}) if %{Em} else %{H}"
           },
           h:{
-            E:"TODO"
+            E:"return reduce(%{S}, %{E})",
+            imp:["Func"]
           }
         },
         T:{
@@ -284,7 +292,7 @@
             E:"return %{S}(%{H}) + %{REC}(%{T}) if %{E} else []"
           },
           h:{
-            E:"TODO"
+            E:"return list(map(%{S}, %{E}))"
           }
         },
         F:{
@@ -303,7 +311,7 @@
             bib:["singular_Si_"]
           },
           h:{
-            E:"TODO"
+            E:"return list(filter(%{S}, %{E}))"
           }
         }
       },
@@ -322,7 +330,7 @@
             P:"%{S}(%{A})"
           },
           h:{
-            E:"TODO"
+            E:"%{E}.forEach(%{S});"
           }
         },
         A:{
@@ -338,7 +346,8 @@
             E:"return %{E} ? %{REC}(%{T}) + %{S}(%{H}) : 0;"
           },
           h:{
-            E:"TODO"
+            E:"return %{E}.map(%{S}).reduce(suma, 0);",
+            bib:["suma"]
           }
         },
         AC:{
@@ -357,7 +366,8 @@
             bib:["unoSi_OCeroSiNo"]
           },
           h:{
-            E:"TODO"
+            E:"return %{E}.filter(%{S}).reduce(suma, 0);",
+            bib:["suma"]
           }
         },
         B:{
@@ -369,7 +379,7 @@
             E:"return %{E} && (%{S}(%{H}) || %{REC}(%{T}));"
           },
           h:{
-            E:"TODO"
+            E:"return %{E}.some(%{S});"
           }
         },
         BS:{
@@ -381,7 +391,7 @@
             EF:"return %{S}(%{H}) ? %{H} : %{REC}(%{T});"
           },
           h:{
-            E:"TODO"
+            E:"return %{E}.find(%{S});"
           }
         },
         M:{
@@ -397,7 +407,7 @@
             E:"return %{Em} ? %{S}(%{REC}(%{T}), %{H}) : %{H};"
           },
           h:{
-            E:"TODO"
+            E:"return %{E}.reduce(%{S});"
           }
         },
         T:{
@@ -415,7 +425,7 @@
             E:"return %{E} ? %{S}(%{H}) + %{REC}(%{T}) : [];"
           },
           h:{
-            E:"TODO"
+            E:"return %{E}.map(%{S});"
           }
         },
         F:{
@@ -434,7 +444,7 @@
             bib:["singular_Si_"]
           },
           h:{
-            E:"TODO"
+            E:"return %{E}.filter(%{S});"
           }
         }
       },
@@ -702,7 +712,7 @@
             B:false
           },
           h:{
-            // TODO
+            E:"lista"
           }
         },
         N:{
@@ -780,7 +790,7 @@
             B:false
           },
           h:{
-            // TODO
+            E:"lista"
           }
         },
         N:{
